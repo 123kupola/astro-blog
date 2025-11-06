@@ -28,23 +28,92 @@ const description = "Admin dashboard for managing site content";
             Welcome to the admin panel{Astro.locals.user?.name ? `, ${Astro.locals.user.name.split(' ')[0]}` : ''}. Here you can manage your content.
           </p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
-              <h3 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">Content Management</h3>
-              <p class="text-blue-700 dark:text-blue-300 mb-4">Manage blog posts and pages</p>
-              <a href="/blog" class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">View Blog →</a>
+          <!-- Content Management Interface -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <!-- Header with Actions -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Content Management</h2>
+                <div class="flex items-center space-x-3">
+                  <button
+                    id="new-post-btn"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    New Post
+                  </button>
+                  <button
+                    id="new-howto-btn"
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    New How-to
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
-              <h3 class="text-lg font-medium text-green-900 dark:text-green-100 mb-2">Site Settings</h3>
-              <p class="text-green-700 dark:text-green-300 mb-4">Configure site preferences</p>
-              <span class="text-green-600 dark:text-green-400">Coming Soon</span>
+            <!-- Filters and Search -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                <div class="flex items-center space-x-4">
+                  <div>
+                    <label for="content-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                    <select id="content-type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                      <option value="">All Content</option>
+                      <option value="posts">Posts</option>
+                      <option value="howtos">How-tos</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="content-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+                    <select id="content-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                      <option value="">All Status</option>
+                      <option value="published">Published</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="flex-1 max-w-lg">
+                  <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
+                  <div class="mt-1 relative">
+                    <input
+                      type="text"
+                      id="search"
+                      placeholder="Search content..."
+                      class="block w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+                    />
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg">
-              <h3 class="text-lg font-medium text-purple-900 dark:text-purple-100 mb-2">Analytics</h3>
-              <p class="text-purple-700 dark:text-purple-300 mb-4">View site statistics</p>
-              <span class="text-purple-600 dark:text-purple-400">Coming Soon</span>
+            <!-- Content List -->
+            <div id="content-list" class="divide-y divide-gray-200 dark:divide-gray-700">
+              <!-- Content items will be loaded here via JavaScript -->
+              <div id="loading" class="px-6 py-12 text-center">
+                <div class="inline-flex items-center">
+                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Loading content...
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hidden">
+              <!-- Pagination controls will be added here -->
             </div>
           </div>
 
@@ -64,20 +133,261 @@ const description = "Admin dashboard for managing site content";
   <script>
     import { authClient } from '../../lib/auth-client';
 
-    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+    // Content management state
+    let currentContent = [];
+    let filteredContent = [];
+    let currentFilters = {
+      type: '',
+      status: '',
+      search: ''
+    };
+
+    // Load content from API
+    async function loadContent() {
       try {
-        await authClient.signOut({
-          fetchOptions: {
-            onSuccess: () => {
-              window.location.href = '/admin';
-            },
-          },
-        });
+        const params = new URLSearchParams();
+        if (currentFilters.type) params.append('type', currentFilters.type);
+        if (currentFilters.status) params.append('status', currentFilters.status);
+        if (currentFilters.search) params.append('search', currentFilters.search);
+
+        const response = await fetch(`/api/admin/content?${params}`);
+        const result = await response.json();
+
+        if (result.success) {
+          currentContent = result.data;
+          filteredContent = [...currentContent];
+          renderContent();
+        } else {
+          showError('Failed to load content');
+        }
       } catch (error) {
-        console.error('Logout failed:', error);
-        // Fallback: redirect anyway
-        window.location.href = '/admin';
+        console.error('Error loading content:', error);
+        showError('Failed to load content');
       }
+    }
+
+    // Render content list
+    function renderContent() {
+      const contentList = document.getElementById('content-list');
+      const loading = document.getElementById('loading');
+
+      if (!contentList) return;
+
+      // Hide loading
+      if (loading) loading.style.display = 'none';
+
+      if (filteredContent.length === 0) {
+        contentList.innerHTML = `
+          <div class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No content found</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              ${currentFilters.search ? 'Try adjusting your search terms.' : 'Get started by creating your first post or how-to guide.'}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      const contentHtml = filteredContent.map(item => `
+        <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center space-x-3">
+                <div class="flex-shrink-0">
+                  ${item.image ?
+                    `<img class="h-12 w-12 rounded-lg object-cover" src="${item.image}" alt="${item.title}">` :
+                    `<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                      <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                    </div>`
+                  }
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    <a href="${item.url}" target="_blank" class="hover:text-blue-600 dark:hover:text-blue-400">${item.title}</a>
+                  </h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 truncate">${item.description}</p>
+                  <div class="flex items-center space-x-4 mt-1">
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      ${item.type === 'post' ? '📝' : '📚'} ${item.type}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      👤 ${item.author}
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                      📅 ${new Date(item.date).toLocaleDateString()}
+                    </span>
+                    ${item.tags && item.tags.length > 0 ? `
+                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                        🏷️ ${item.tags.slice(0, 2).join(', ')}${item.tags.length > 2 ? '...' : ''}
+                      </span>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <!-- Status Badge -->
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                item.published
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+              }">
+                ${item.published ? 'Published' : 'Draft'}
+              </span>
+
+              <!-- Featured Badge -->
+              ${item.featured ? `
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                  Featured
+                </span>
+              ` : ''}
+
+              <!-- Action Buttons -->
+              <div class="flex items-center space-x-2">
+                <button
+                  onclick="editContent('${item.id}')"
+                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  title="Edit"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button
+                  onclick="togglePublish('${item.id}', ${item.published})"
+                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  title="${item.published ? 'Unpublish' : 'Publish'}"
+                >
+                  ${item.published ? `
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                    </svg>
+                  ` : `
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  `}
+                </button>
+                <a
+                  href="${item.url}"
+                  target="_blank"
+                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  title="View"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      contentList.innerHTML = contentHtml;
+    }
+
+    // Toggle publish status
+    async function togglePublish(id, currentStatus) {
+      try {
+        const response = await fetch(`/api/admin/content`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'toggle-publish',
+            id: id
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Update the item in our local data
+          const item = currentContent.find(item => item.id === id);
+          if (item) {
+            item.published = result.data.published;
+            filteredContent = [...currentContent];
+            renderContent();
+          }
+          showSuccess(`Content ${result.data.published ? 'published' : 'unpublished'} successfully`);
+        } else {
+          showError(result.error || 'Failed to update content status');
+        }
+      } catch (error) {
+        console.error('Error toggling publish status:', error);
+        showError('Failed to update content status');
+      }
+    }
+
+    // Edit content (placeholder for now)
+    function editContent(id) {
+      showError('Content editing coming soon! For now, edit files directly in your Obsidian vault.');
+    }
+
+    // Show success message
+    function showSuccess(message) {
+      // Simple alert for now - could be enhanced with toast notifications
+      alert(`✅ ${message}`);
+    }
+
+    // Show error message
+    function showError(message) {
+      alert(`❌ ${message}`);
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load initial content
+      loadContent();
+
+      // Filter event listeners
+      document.getElementById('content-type')?.addEventListener('change', (e) => {
+        currentFilters.type = e.target.value;
+        loadContent();
+      });
+
+      document.getElementById('content-status')?.addEventListener('change', (e) => {
+        currentFilters.status = e.target.value;
+        loadContent();
+      });
+
+      document.getElementById('search')?.addEventListener('input', (e) => {
+        currentFilters.search = e.target.value;
+        loadContent();
+      });
+
+      // New content buttons (placeholders for now)
+      document.getElementById('new-post-btn')?.addEventListener('click', () => {
+        showError('New post creation coming soon! For now, create posts in your Obsidian vault.');
+      });
+
+      document.getElementById('new-howto-btn')?.addEventListener('click', () => {
+        showError('New how-to creation coming soon! For now, create how-tos in your Obsidian vault.');
+      });
+
+      // Logout functionality
+      document.getElementById('logout-btn')?.addEventListener('click', async () => {
+        try {
+          await authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                window.location.href = '/admin';
+              },
+            },
+          });
+        } catch (error) {
+          console.error('Logout failed:', error);
+          window.location.href = '/admin';
+        }
+      });
     });
   </script>
 </Layout>
