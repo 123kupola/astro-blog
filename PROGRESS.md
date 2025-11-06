@@ -29,6 +29,9 @@
 - ✅ **Redirect URI Fixed**: Resolved Google Cloud Console configuration issues
 - ✅ **User Authentication**: Real Google user data displayed in dashboard
 - ✅ **Session Management**: Persistent sessions with proper security
+- ✅ **Navigation UI Fixed**: Header shows "Logout" when authenticated, "Login" when not
+- ✅ **Environment Variables**: Fixed import.meta.env loading for OAuth credentials
+- ✅ **API Endpoints**: Added /api/auth/check and /api/auth/logout endpoints
 - ✅ **Code Quality**: Clean, production-ready authentication system
 - ✅ **Documentation Updated**: Obsidian guide corrected for proper vault path
 
