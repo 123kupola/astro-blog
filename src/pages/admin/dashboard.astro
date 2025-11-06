@@ -1,4 +1,5 @@
 ---
+/// <reference path="../../env.d.ts" />
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
@@ -79,23 +80,26 @@ allContent.sort((a, b) => {
     <div class="max-w-4xl mx-auto">
       <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-           <div class="flex items-center justify-between mb-4">
-             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
-             {Astro.locals.user && (
-               <div class="flex items-center space-x-3">
-                 {Astro.locals.user.image && (
-                   <img src={Astro.locals.user.image} alt={Astro.locals.user.name || 'User'} class="w-8 h-8 rounded-full" />
-                 )}
-                 <div class="text-right">
-                   <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{Astro.locals.user.name || 'Admin'}</p>
-                   <p class="text-xs text-gray-500 dark:text-gray-400">{Astro.locals.user.email}</p>
-                 </div>
-               </div>
-             )}
-           </div>
-           <p class="text-gray-600 dark:text-gray-400 mb-6">
-             Welcome to the admin panel{Astro.locals.user?.name ? `, ${Astro.locals.user.name.split(' ')[0]}` : ''}. Here you can manage your content.
-           </p>
+            <div class="flex items-center justify-between mb-4">
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
+              {(Astro.locals as any).user && (
+                <div class="flex items-center space-x-3">
+                  {(Astro.locals as any).user.image && (
+                    <img src={(Astro.locals as any).user.image} alt={(Astro.locals as any).user.name || 'User'} class="w-8 h-8 rounded-full" />
+                  )}
+                  <div class="text-right">
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{(Astro.locals as any).user.name || 'User'}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{(Astro.locals as any).user.email}</p>
+                    <p class="text-xs px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-medium">
+                      {(Astro.locals as any).user.role === 'admin' ? 'Admin' : 'User'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              Welcome to the admin panel{(Astro.locals as any).user?.name ? `, ${(Astro.locals as any).user.name.split(' ')[0]}` : ''}. Here you can manage your content.
+            </p>
 
           <!-- Content Management Interface -->
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -103,26 +107,35 @@ allContent.sort((a, b) => {
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
               <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Content Management</h2>
-                <div class="flex items-center space-x-3">
-                   <a
-                     href="/admin/new-post"
-                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                   >
-                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                     </svg>
-                     New Post
-                   </a>
-                   <a
-                     href="/admin/new-howto"
-                     class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                   >
-                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                     </svg>
-                     New How-to
-                   </a>
-                </div>
+                 <div class="flex items-center space-x-3">
+                   {(Astro.locals as any).user?.role === 'admin' && (
+                     <>
+                       <a
+                         href="/admin/new-post"
+                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                       >
+                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                         </svg>
+                         New Post
+                       </a>
+                       <a
+                         href="/admin/new-howto"
+                         class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                       >
+                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                         </svg>
+                         New How-to
+                       </a>
+                     </>
+                   )}
+                   {(Astro.locals as any).user?.role !== 'admin' && (
+                     <div class="text-sm text-gray-500 dark:text-gray-400">
+                       You have read-only access to the admin dashboard.
+                     </div>
+                   )}
+                 </div>
               </div>
             </div>
 
@@ -247,44 +260,60 @@ allContent.sort((a, b) => {
                            {item.featured ? '★ Featured' : '☆ Feature'}
                          </button>
 
-                         <!-- Action Buttons -->
-                         <div class="flex items-center space-x-2">
-                           <button
-                             onclick={`editContent('${item.id}')`}
-                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                             title="Edit"
-                           >
-                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                             </svg>
-                           </button>
-                           <button
-                             onclick={`togglePublish('${item.id}', ${item.published})`}
-                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                             title={item.published ? 'Unpublish' : 'Publish'}
-                           >
-                             {item.published ? (
-                               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                               </svg>
-                             ) : (
-                               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                               </svg>
-                             )}
-                           </button>
-                           <a
-                             href={item.url}
-                             target="_blank"
-                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                             title="View"
-                           >
-                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                             </svg>
-                           </a>
-                         </div>
+                          <!-- Action Buttons -->
+                          {(Astro.locals as any).user?.role === 'admin' ? (
+                            <div class="flex items-center space-x-2">
+                              <button
+                                onclick={`editContent('${item.id}')`}
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                title="Edit"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                              </button>
+                              <button
+                                onclick={`togglePublish('${item.id}', ${item.published})`}
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                title={item.published ? 'Unpublish' : 'Publish'}
+                              >
+                                {item.published ? (
+                                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                                  </svg>
+                                ) : (
+                                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                  </svg>
+                                )}
+                              </button>
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                title="View"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                              </a>
+                            </div>
+                          ) : (
+                            <div class="flex items-center space-x-2">
+                              <a
+                                href={item.url}
+                                target="_blank"
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                title="View"
+                              >
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                              </a>
+                              <span class="text-xs text-gray-400 dark:text-gray-500">Read-only</span>
+                            </div>
+                          )}
                        </div>
                      </div>
                    </div>
