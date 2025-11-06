@@ -6,3 +6,12 @@ declare namespace App {
     session: import("better-auth").Session | null;
   }
 }
+
+declare global {
+  namespace Astro {
+    interface Locals {
+      user: import("better-auth").User | null;
+      session: import("better-auth").Session | null;
+    }
+  }
+}
