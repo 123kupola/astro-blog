@@ -39,7 +39,7 @@ Before starting, ensure you have:
 
 ### Locate Your Content Directory
 
-Your blog content is stored in: `src/content/posts/`
+Your blog content is stored in: `src/astro-blog/`
 
 This directory is already configured as an Obsidian vault with templates and settings.
 
@@ -47,7 +47,7 @@ This directory is already configured as an Obsidian vault with templates and set
 
 1. **Launch Obsidian**
 2. **Click "Open folder as vault"**
-3. **Navigate to**: `/home/samob/ai/astro/src/content/posts/`
+3. **Navigate to**: `/home/samob/ai/astro/src/astro-blog/`
 4. **Click "Open"**
 
 The vault will load with your existing blog posts and configuration.
@@ -55,14 +55,16 @@ The vault will load with your existing blog posts and configuration.
 ## Step 2: Understand the Vault Structure
 
 ```
-src/content/posts/
+src/astro-blog/
 ├── .obsidian/           # Obsidian configuration
 │   ├── app.json        # App settings
 │   └── templates/      # Content templates
 │       └── blog-post.md
-├── astro-modular-demo-overview.md
-├── complete-astro-docker-guide.md
-└── docker-astro-production-guide.md
+├── content/
+│   ├── posts/          # Blog posts
+│   ├── howtos/         # How-to guides
+│   └── assets/         # Images and attachments
+└── [additional files...]
 ```
 
 ### Key Files
@@ -219,10 +221,12 @@ npm run publish unpublish your-post-slug
 ### Folder Structure
 
 ```
-content/
-├── posts/           # Blog posts
-├── howtos/          # How-to guides
-└── assets/          # Images and attachments
+astro-blog/
+├── content/
+│   ├── posts/           # Blog posts
+│   ├── howtos/          # How-to guides
+│   └── assets/          # Images and attachments
+└── .obsidian/           # Obsidian configuration
 ```
 
 ### Naming Conventions

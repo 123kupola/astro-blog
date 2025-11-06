@@ -1,8 +1,77 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
 
 const title = "Admin Dashboard";
 const description = "Admin dashboard for managing site content";
+
+// User authentication is handled by middleware
+
+// Load content server-side
+let allContent: any[] = [];
+
+// Get posts
+try {
+  const posts = await (getCollection as any)('posts');
+  const postsWithMeta = posts.map((post: any) => ({
+    id: post.slug,
+    type: 'post',
+    title: post.data.title || 'Untitled Post',
+    description: post.data.description || '',
+    date: post.data.date.toISOString(),
+    author: post.data.author || 'Unknown',
+    published: post.data.published,
+    featured: post.data.featured || false,
+    tags: post.data.tags || [],
+    image: post.data.image,
+    order: post.data.order || 0,
+    url: `/blog/${post.slug}`
+  }));
+  allContent.push(...postsWithMeta);
+} catch (error) {
+  console.error('Error loading posts:', error);
+}
+
+// Get howtos
+try {
+  const howtos = await (getCollection as any)('howtos');
+  const howtosWithMeta = howtos.map((howto: any) => ({
+    id: howto.slug,
+    type: 'howto',
+    title: howto.data.title || 'Untitled How-to',
+    description: howto.data.description || '',
+    date: howto.data.date.toISOString(),
+    author: howto.data.author || 'Unknown',
+    published: howto.data.published,
+    featured: howto.data.featured || false,
+    tags: howto.data.tags || [],
+    image: howto.data.image,
+    difficulty: howto.data.difficulty,
+    timeRequired: howto.data.timeRequired,
+    order: howto.data.order || 0,
+    url: `/howtos/${howto.slug}`
+  }));
+  allContent.push(...howtosWithMeta);
+} catch (error) {
+  console.error('Error loading howtos:', error);
+}
+
+// Sort by featured status (featured first), then by order, then by date
+allContent.sort((a, b) => {
+  // Featured items always come first
+  if (a.featured && !b.featured) return -1;
+  if (!a.featured && b.featured) return 1;
+
+  // For non-featured items, sort by order if available
+  if (!a.featured && !b.featured) {
+    const aOrder = a.order || 999;
+    const bOrder = b.order || 999;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+  }
+
+  // Finally sort by date (newest first)
+  return new Date(b.date).getTime() - new Date(a.date).getTime();
+});
 ---
 
 <Layout title={title} description={description}>
@@ -10,23 +79,23 @@ const description = "Admin dashboard for managing site content";
     <div class="max-w-4xl mx-auto">
       <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
-            {Astro.locals.user && (
-              <div class="flex items-center space-x-3">
-                {Astro.locals.user.image && (
-                  <img src={Astro.locals.user.image} alt={Astro.locals.user.name || 'User'} class="w-8 h-8 rounded-full" />
-                )}
-                <div class="text-right">
-                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{Astro.locals.user.name || 'Admin'}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">{Astro.locals.user.email}</p>
-                </div>
-              </div>
-            )}
-          </div>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">
-            Welcome to the admin panel{Astro.locals.user?.name ? `, ${Astro.locals.user.name.split(' ')[0]}` : ''}. Here you can manage your content.
-          </p>
+           <div class="flex items-center justify-between mb-4">
+             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
+             {Astro.locals.user && (
+               <div class="flex items-center space-x-3">
+                 {Astro.locals.user.image && (
+                   <img src={Astro.locals.user.image} alt={Astro.locals.user.name || 'User'} class="w-8 h-8 rounded-full" />
+                 )}
+                 <div class="text-right">
+                   <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{Astro.locals.user.name || 'Admin'}</p>
+                   <p class="text-xs text-gray-500 dark:text-gray-400">{Astro.locals.user.email}</p>
+                 </div>
+               </div>
+             )}
+           </div>
+           <p class="text-gray-600 dark:text-gray-400 mb-6">
+             Welcome to the admin panel{Astro.locals.user?.name ? `, ${Astro.locals.user.name.split(' ')[0]}` : ''}. Here you can manage your content.
+           </p>
 
           <!-- Content Management Interface -->
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
@@ -35,24 +104,24 @@ const description = "Admin dashboard for managing site content";
               <div class="flex items-center justify-between">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Content Management</h2>
                 <div class="flex items-center space-x-3">
-                  <button
-                    id="new-post-btn"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    New Post
-                  </button>
-                  <button
-                    id="new-howto-btn"
-                    class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                    New How-to
-                  </button>
+                   <a
+                     href="/admin/new-post"
+                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                   >
+                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                     </svg>
+                     New Post
+                   </a>
+                   <a
+                     href="/admin/new-howto"
+                     class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                   >
+                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                     </svg>
+                     New How-to
+                   </a>
                 </div>
               </div>
             </div>
@@ -98,18 +167,130 @@ const description = "Admin dashboard for managing site content";
             </div>
 
             <!-- Content List -->
-            <div id="content-list" class="divide-y divide-gray-200 dark:divide-gray-700">
-              <!-- Content items will be loaded here via JavaScript -->
-              <div id="loading" class="px-6 py-12 text-center">
-                <div class="inline-flex items-center">
-                  <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Loading content...
-                </div>
-              </div>
-            </div>
+             <div id="content-list" class="divide-y divide-gray-200 dark:divide-gray-700" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+               {allContent.length === 0 ? (
+                 <div class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                   <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                   </svg>
+                   <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No content found</h3>
+                   <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating your first post or how-to guide.</p>
+                 </div>
+               ) : (
+                 allContent.map(item => (
+                   <div class={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 ${item.featured ? 'bg-purple-50 dark:bg-purple-900/10 border-l-4 border-purple-400' : ''}`} draggable={!item.featured} ondragstart={`handleDragStart(event, '${item.id}')`} data-id={item.id} data-featured={item.featured}>
+                     <div class="flex items-center justify-between">
+                       <div class="flex-1 min-w-0">
+                         <div class="flex items-center space-x-3">
+                           {!item.featured && (
+                             <div class="flex-shrink-0 cursor-move">
+                               <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                               </svg>
+                             </div>
+                           )}
+                           <div class="flex-shrink-0">
+                             {item.image ? (
+                               <img class="h-12 w-12 rounded-lg object-cover" src={item.image} alt={item.title} />
+                             ) : (
+                               <div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                 <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                 </svg>
+                               </div>
+                             )}
+                           </div>
+                           <div class="min-w-0 flex-1">
+                             <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                               <a href={item.url} target="_blank" class="hover:text-blue-600 dark:hover:text-blue-400">{item.title}</a>
+                             </h3>
+                             <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{item.description}</p>
+                             <div class="flex items-center space-x-4 mt-1">
+                               <span class="text-xs text-gray-500 dark:text-gray-400">
+                                 {item.type === 'post' ? '📝' : '📚'} {item.type}
+                               </span>
+                               <span class="text-xs text-gray-500 dark:text-gray-400">
+                                 👤 {item.author}
+                               </span>
+                               <span class="text-xs text-gray-500 dark:text-gray-400">
+                                 📅 {new Date(item.date).toLocaleDateString()}
+                               </span>
+                               {item.tags && item.tags.length > 0 && (
+                                 <span class="text-xs text-gray-500 dark:text-gray-400">
+                                   🏷️ {item.tags.slice(0, 2).join(', ')}{item.tags.length > 2 ? '...' : ''}
+                                 </span>
+                               )}
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                       <div class="flex items-center space-x-3">
+                         <!-- Status Badge -->
+                         <span class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                           item.published
+                             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                         }`}>
+                           {item.published ? 'Published' : 'Draft'}
+                         </span>
+
+                         <!-- Featured Toggle -->
+                         <button
+                           onclick={`toggleFeatured('${item.id}', ${item.featured})`}
+                           class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
+                             item.featured
+                               ? 'bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/30'
+                               : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
+                           }`}
+                           title={item.featured ? 'Remove from featured' : 'Mark as featured'}
+                         >
+                           {item.featured ? '★ Featured' : '☆ Feature'}
+                         </button>
+
+                         <!-- Action Buttons -->
+                         <div class="flex items-center space-x-2">
+                           <button
+                             onclick={`editContent('${item.id}')`}
+                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                             title="Edit"
+                           >
+                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                             </svg>
+                           </button>
+                           <button
+                             onclick={`togglePublish('${item.id}', ${item.published})`}
+                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                             title={item.published ? 'Unpublish' : 'Publish'}
+                           >
+                             {item.published ? (
+                               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                               </svg>
+                             ) : (
+                               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                               </svg>
+                             )}
+                           </button>
+                           <a
+                             href={item.url}
+                             target="_blank"
+                             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                             title="View"
+                           >
+                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                             </svg>
+                           </a>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 ))
+               )}
+             </div>
 
             <!-- Pagination -->
             <div id="pagination" class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hidden">
@@ -134,164 +315,7 @@ const description = "Admin dashboard for managing site content";
     import { authClient } from '../../lib/auth-client';
 
     // Content management state
-    let currentContent = [];
-    let filteredContent = [];
-    let currentFilters = {
-      type: '',
-      status: '',
-      search: ''
-    };
-
-    // Load content from API
-    async function loadContent() {
-      try {
-        const params = new URLSearchParams();
-        if (currentFilters.type) params.append('type', currentFilters.type);
-        if (currentFilters.status) params.append('status', currentFilters.status);
-        if (currentFilters.search) params.append('search', currentFilters.search);
-
-        const response = await fetch(`/api/admin/content?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-          currentContent = result.data;
-          filteredContent = [...currentContent];
-          renderContent();
-        } else {
-          showError('Failed to load content');
-        }
-      } catch (error) {
-        console.error('Error loading content:', error);
-        showError('Failed to load content');
-      }
-    }
-
-    // Render content list
-    function renderContent() {
-      const contentList = document.getElementById('content-list');
-      const loading = document.getElementById('loading');
-
-      if (!contentList) return;
-
-      // Hide loading
-      if (loading) loading.style.display = 'none';
-
-      if (filteredContent.length === 0) {
-        contentList.innerHTML = `
-          <div class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No content found</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              ${currentFilters.search ? 'Try adjusting your search terms.' : 'Get started by creating your first post or how-to guide.'}
-            </p>
-          </div>
-        `;
-        return;
-      }
-
-      const contentHtml = filteredContent.map(item => `
-        <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center space-x-3">
-                <div class="flex-shrink-0">
-                  ${item.image ?
-                    `<img class="h-12 w-12 rounded-lg object-cover" src="${item.image}" alt="${item.title}">` :
-                    `<div class="h-12 w-12 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                      </svg>
-                    </div>`
-                  }
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    <a href="${item.url}" target="_blank" class="hover:text-blue-600 dark:hover:text-blue-400">${item.title}</a>
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 truncate">${item.description}</p>
-                  <div class="flex items-center space-x-4 mt-1">
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      ${item.type === 'post' ? '📝' : '📚'} ${item.type}
-                    </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      👤 ${item.author}
-                    </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      📅 ${new Date(item.date).toLocaleDateString()}
-                    </span>
-                    ${item.tags && item.tags.length > 0 ? `
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
-                        🏷️ ${item.tags.slice(0, 2).join(', ')}${item.tags.length > 2 ? '...' : ''}
-                      </span>
-                    ` : ''}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <!-- Status Badge -->
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                item.published
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-              }">
-                ${item.published ? 'Published' : 'Draft'}
-              </span>
-
-              <!-- Featured Badge -->
-              ${item.featured ? `
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
-                  Featured
-                </span>
-              ` : ''}
-
-              <!-- Action Buttons -->
-              <div class="flex items-center space-x-2">
-                <button
-                  onclick="editContent('${item.id}')"
-                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  title="Edit"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-                <button
-                  onclick="togglePublish('${item.id}', ${item.published})"
-                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  title="${item.published ? 'Unpublish' : 'Publish'}"
-                >
-                  ${item.published ? `
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-                    </svg>
-                  ` : `
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                    </svg>
-                  `}
-                </button>
-                <a
-                  href="${item.url}"
-                  target="_blank"
-                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  title="View"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                  </svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      contentList.innerHTML = contentHtml;
-    }
+    let draggedElement = null;
 
     // Toggle publish status
     async function togglePublish(id, currentStatus) {
@@ -310,12 +334,34 @@ const description = "Admin dashboard for managing site content";
         const result = await response.json();
 
         if (result.success) {
-          // Update the item in our local data
-          const item = currentContent.find(item => item.id === id);
+          // Update the DOM element
+          const item = document.querySelector(`[data-id="${id}"]`);
           if (item) {
-            item.published = result.data.published;
-            filteredContent = [...currentContent];
-            renderContent();
+            const statusBadge = item.querySelector('.inline-flex.items-center.px-2\\.5.py-0\\.5');
+            if (statusBadge) {
+              if (result.data.published) {
+                statusBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
+                statusBadge.textContent = 'Published';
+              } else {
+                statusBadge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
+                statusBadge.textContent = 'Draft';
+              }
+            }
+            // Update publish button
+            const publishBtn = item.querySelector('button[title*="Publish"], button[title*="Unpublish"]');
+            if (publishBtn) {
+              publishBtn.setAttribute('title', result.data.published ? 'Unpublish' : 'Publish');
+              publishBtn.innerHTML = result.data.published ? `
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              ` : `
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              `;
+            }
           }
           showSuccess(`Content ${result.data.published ? 'published' : 'unpublished'} successfully`);
         } else {
@@ -327,9 +373,175 @@ const description = "Admin dashboard for managing site content";
       }
     }
 
-    // Edit content (placeholder for now)
+    // Toggle featured status
+    async function toggleFeatured(id, currentStatus) {
+      try {
+        const response = await fetch(`/api/admin/content`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'toggle-featured',
+            id: id
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Update the DOM element
+          const item = document.querySelector(`[data-id="${id}"]`);
+          if (item) {
+            item.setAttribute('data-featured', String(result.data.featured));
+            if (result.data.featured) {
+              item.classList.add('bg-purple-50', 'dark:bg-purple-900/10', 'border-l-4', 'border-purple-400');
+            } else {
+              item.classList.remove('bg-purple-50', 'dark:bg-purple-900/10', 'border-l-4', 'border-purple-400');
+            }
+
+            // Update featured button
+            const featuredBtn = item.querySelector('button[title*="featured"]');
+            if (featuredBtn) {
+              featuredBtn.setAttribute('title', result.data.featured ? 'Remove from featured' : 'Mark as featured');
+              featuredBtn.innerHTML = result.data.featured ? '★ Featured' : '☆ Feature';
+              if (result.data.featured) {
+                featuredBtn.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/30';
+              } else {
+                featuredBtn.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600';
+              }
+            }
+
+            // Update drag handle visibility
+            const dragHandle = item.querySelector('.cursor-move') as HTMLElement;
+            if (dragHandle) {
+              dragHandle.style.display = result.data.featured ? 'none' : 'block';
+            }
+
+            // Update draggable attribute
+            item.setAttribute('draggable', String(!result.data.featured));
+          }
+          showSuccess(`Content ${result.data.featured ? 'marked as featured' : 'removed from featured'} successfully`);
+        } else {
+          showError(result.error || 'Failed to update featured status');
+        }
+      } catch (error) {
+        console.error('Error toggling featured status:', error);
+        showError('Failed to update featured status');
+      }
+    }
+
+    // Edit content
     function editContent(id) {
-      showError('Content editing coming soon! For now, edit files directly in your Obsidian vault.');
+      // Find the content type by checking the item
+      const item = document.querySelector(`[data-id="${id}"]`);
+      if (item) {
+        const typeText = item.textContent || '';
+        if (typeText.includes('📝') || typeText.includes('post')) {
+          window.location.href = `/admin/edit-post?id=${id}`;
+        } else if (typeText.includes('📚') || typeText.includes('howto')) {
+          window.location.href = `/admin/edit-howto?id=${id}`;
+        }
+      } else {
+        showError('Content not found');
+      }
+    }
+
+    // Drag and drop functionality
+    function handleDragStart(event, id) {
+      draggedElement = id;
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/html', event.target.outerHTML);
+      (event.target as HTMLElement).style.opacity = '0.5';
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+
+      if (!draggedElement) return;
+
+      const targetElement = event.target.closest('[data-id]');
+      if (!targetElement) return;
+
+      const targetId = targetElement.getAttribute('data-id');
+      const targetFeatured = targetElement.getAttribute('data-featured') === 'true';
+
+      // Don't allow dropping on featured items or if dragging a featured item
+      const draggedItem = document.querySelector(`[data-id="${draggedElement}"]`);
+      if (!draggedItem || draggedItem.getAttribute('data-featured') === 'true' || targetFeatured) {
+        return;
+      }
+
+      // Move the dragged element to the new position
+      const contentList = document.getElementById('content-list');
+      if (!contentList) return;
+
+      const draggedElementNode = draggedItem;
+      const targetElementNode = targetElement;
+
+      // Insert before or after based on position
+      const rect = targetElement.getBoundingClientRect();
+      const midpoint = rect.top + rect.height / 2;
+
+      if (event.clientY < midpoint) {
+        // Insert before
+        contentList.insertBefore(draggedElementNode, targetElementNode);
+      } else {
+        // Insert after
+        contentList.insertBefore(draggedElementNode, targetElementNode.nextSibling);
+      }
+
+      // Update order in backend
+      updateOrder();
+
+      draggedElement = null;
+
+      // Reset opacity
+      (draggedItem as HTMLElement).style.opacity = '1';
+
+      return false;
+    }
+
+    async function updateOrder() {
+      try {
+        const contentItems = document.querySelectorAll('[data-id]');
+        const nonFeaturedItems = Array.from(contentItems)
+          .filter(item => item.getAttribute('data-featured') !== 'true')
+          .map((item, index) => ({
+            id: item.getAttribute('data-id'),
+            type: item.textContent?.includes('📝') ? 'post' : 'howto',
+            order: index + 1
+          }));
+
+        const response = await fetch('/api/admin/content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'update-order',
+            order: nonFeaturedItems
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          console.error('Failed to update order:', result.error);
+          // Reload page to revert changes
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Error updating order:', error);
+        // Reload page to revert changes
+        window.location.reload();
+      }
     }
 
     // Show success message
@@ -345,39 +557,58 @@ const description = "Admin dashboard for managing site content";
 
     // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
-      // Load initial content
-      loadContent();
-
       // Filter event listeners
       document.getElementById('content-type')?.addEventListener('change', (e) => {
-        currentFilters.type = e.target.value;
-        loadContent();
+        // For now, just reload with filters
+        const type = (e.target as HTMLSelectElement).value;
+        const url = new URL(window.location.href);
+        if (type) {
+          url.searchParams.set('type', type);
+        } else {
+          url.searchParams.delete('type');
+        }
+        window.location.href = url.toString();
       });
 
       document.getElementById('content-status')?.addEventListener('change', (e) => {
-        currentFilters.status = e.target.value;
-        loadContent();
+        const status = (e.target as HTMLSelectElement).value;
+        const url = new URL(window.location.href);
+        if (status) {
+          url.searchParams.set('status', status);
+        } else {
+          url.searchParams.delete('status');
+        }
+        window.location.href = url.toString();
       });
 
       document.getElementById('search')?.addEventListener('input', (e) => {
-        currentFilters.search = e.target.value;
-        loadContent();
+        const search = (e.target as HTMLInputElement).value;
+        const url = new URL(window.location.href);
+        if (search) {
+          url.searchParams.set('search', search);
+        } else {
+          url.searchParams.delete('search');
+        }
+        window.location.href = url.toString();
       });
 
-      // New content buttons (placeholders for now)
-      document.getElementById('new-post-btn')?.addEventListener('click', () => {
-        showError('New post creation coming soon! For now, create posts in your Obsidian vault.');
-      });
-
-      document.getElementById('new-howto-btn')?.addEventListener('click', () => {
-        showError('New how-to creation coming soon! For now, create how-tos in your Obsidian vault.');
-      });
-
-      // Logout functionality (TEMPORARY: Mock logout for testing)
-      document.getElementById('logout-btn')?.addEventListener('click', () => {
-        alert('Logout functionality disabled during testing (OAuth bypass active)');
-        // In real OAuth mode, this would call:
-        // await authClient.signOut({ fetchOptions: { onSuccess: () => window.location.href = '/admin' } });
+      // Logout functionality
+      document.getElementById('logout-btn')?.addEventListener('click', async () => {
+        try {
+          await authClient.signOut({
+            fetchOptions: {
+              onSuccess: () => {
+                window.location.href = '/admin';
+              },
+              onError: () => {
+                alert('Failed to sign out. Please try again.');
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Logout error:', error);
+          alert('Failed to sign out. Please try again.');
+        }
       });
     });
   </script>
