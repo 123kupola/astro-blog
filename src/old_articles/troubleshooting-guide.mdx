@@ -1,0 +1,503 @@
+---
+title: "Troubleshooting Common Docker & Astro Issues"
+description: "A comprehensive guide to solving common Docker and Astro development problems with practical solutions and debugging techniques."
+date: "2024-01-18"
+author: "DevOps Team"
+category: "DevOps"
+image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?w=1200&h=600&fit=crop"
+readTime: "10 min read"
+featured: false
+tags: ["troubleshooting", "docker", "astro", "debugging", "errors"]
+---
+
+# Troubleshooting Common Docker & Astro Issues
+
+## Overview
+
+This guide covers the most common issues developers encounter when working with Docker and Astro, providing practical solutions and debugging techniques to get you back on track quickly.
+
+## Common Issues and Solutions
+
+### 1. "Lockfile not found" Error
+
+#### Cause
+No package-lock.json, yarn.lock, or pnpm-lock.yaml exists in the project directory.
+
+#### Solution
+```bash
+# Generate package-lock.json if missing
+npm install
+
+# Or use yarn if preferred
+yarn install
+
+# Or use pnpm if preferred
+pnpm install
+```
+
+#### Prevention
+Always commit your lockfile to version control:
+
+```bash
+# Add to git
+git add package-lock.json
+git commit -m "Add package lock file"
+```
+
+### 2. "Unexpected return" Build Error
+
+#### Cause
+Syntax error in .astro files or problematic MDX plugins causing build failures.
+
+#### Solution
+
+**Step 1: Check .astro files for syntax errors**
+```bash
+# Validate Astro syntax
+npx astro check
+
+# Look for common issues:
+# - Unclosed tags
+# - Invalid frontmatter
+# - Missing required imports
+```
+
+**Step 2: Temporarily disable MDX plugins**
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  integrations: [
+    mdx({
+      // Temporarily disable plugins
+      plugins: []
+    })
+  ]
+});
+```
+
+**Step 3: Remove problematic remark plugins**
+```javascript
+// Check for problematic plugins in your MDX setup
+const remarkPlugins = [
+  // Remove or comment out problematic plugins
+  // remarkMath,
+  // mermaid
+];
+```
+
+### 3. "Permission denied" for Astro Config
+
+#### Cause
+Astro user can't create config directory in Docker container due to insufficient permissions.
+
+#### Solution
+
+**Option 1: Fix Dockerfile permissions**
+```dockerfile
+# In Dockerfile
+RUN mkdir -p /home/astro && chown -R astro:nodejs /home/astro /app
+ENV HOME=/home/astro
+
+# Better approach: Set permissions early
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/astro astro && \
+    mkdir -p /home/astro && \
+    chown astro:nodejs /home/astro /app
+```
+
+**Option 2: Use volume mounts with correct permissions**
+```yaml
+# docker-compose.yml
+services:
+  astro-app:
+    volumes:
+      - .:/app:cached
+      - /app/node_modules
+    user: "1001:1001"  # Use specific user ID
+```
+
+### 4. "astro: not found" in Container
+
+#### Cause
+Only production dependencies are installed, but astro is a dev dependency.
+
+#### Solution
+
+**Option 1: Install all dependencies in runner stage**
+```dockerfile
+# Install all dependencies, not just production
+COPY package.json package-lock.json* ./
+RUN npm ci  # This installs devDependencies too
+```
+
+**Option 2: Install astro globally**
+```dockerfile
+# Install astro globally
+RUN npm install -g astro
+
+# Or use npx
+CMD ["npx", "astro", "preview"]
+```
+
+**Option 3: Use npm scripts**
+```json
+{
+  "scripts": {
+    "preview": "astro preview --host 0.0.0.0"
+  }
+}
+```
+
+### 5. Site Not Accessible from Host
+
+#### Cause
+Astro preview only listening on localhost (127.0.0.1) inside the container, making it inaccessible from outside.
+
+#### Solution
+
+**Option 1: Add --host flag to preview script**
+```json
+{
+  "scripts": {
+    "preview": "astro preview --host 0.0.0.0"
+  }
+}
+```
+
+**Option 2: Set HOST environment variable**
+```yaml
+# docker-compose.yml
+services:
+  astro-app:
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+```
+
+**Option 3: Update Dockerfile**
+```dockerfile
+ENV HOST=0.0.0.0
+ENV PORT=4321
+```
+
+### 6. CSS Build Errors
+
+#### Cause
+Missing Tailwind color definitions or CSS variables not properly configured.
+
+#### Solution
+
+**Step 1: Extend Tailwind config with CSS variables**
+```javascript
+// tailwind.config.mjs
+export default {
+  content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        border: 'hsl(var(--border))',
+        muted: 'hsl(var(--muted))',
+        accent: 'hsl(var(--accent))',
+        // Add all color variables from global.css
+      },
+    },
+  },
+  plugins: [require('@tailwindcss/typography')],
+}
+```
+
+**Step 2: Keep CSS variables in global.css**
+```css
+/* src/styles/global.css */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --muted: 210 40% 96%;
+  --accent: 210 40% 96%;
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --muted: 217.2 32.6% 17.5%;
+  --accent: 217.2 32.6% 17.5%;
+}
+```
+
+## Advanced Troubleshooting Techniques
+
+### Debug Mode
+
+**Enable Astro debug mode**
+```bash
+# Run with debug flag
+DEBUG=astro:* npm run dev
+
+# Or in Docker
+ENV DEBUG=astro:*
+```
+
+**Enable Docker debug mode**
+```bash
+# Build with verbose output
+docker build --progress=plain -t astro-app .
+
+# Run with debug logs
+docker run --log-level debug astro-app
+```
+
+### Log Analysis
+
+**Check container logs**
+```bash
+# View real-time logs
+docker compose logs -f
+
+# View specific service logs
+docker compose logs -f astro-app
+
+# View last 100 lines
+docker compose logs --tail=100 astro-app
+```
+
+**Check build logs**
+```bash
+# Build with detailed output
+docker compose build --no-cache --progress=plain
+
+# Check specific build stage
+docker build --target builder --progress=plain .
+```
+
+### Network Issues
+
+**Port conflicts**
+```bash
+# Check what's using the port
+lsof -i :4321
+
+# Or use netstat
+netstat -tulpn | grep :4321
+
+# Kill conflicting process
+kill -9 <PID>
+```
+
+**Container networking**
+```bash
+# Check container network
+docker network ls
+
+# Inspect network configuration
+docker network inspect astro_ai-network
+
+# Test connectivity
+docker exec -it <container_id> ping google.com
+```
+
+### Performance Issues
+
+**Resource monitoring**
+```bash
+# Check container resource usage
+docker stats
+
+# Check disk usage
+docker system df
+
+# Clean up unused resources
+docker system prune -a
+```
+
+**Build optimization**
+```bash
+# Use BuildKit for better performance
+export DOCKER_BUILDKIT=1
+docker compose build
+
+# Enable parallel builds
+docker buildx build --platform linux/amd64,linux/arm64 .
+```
+
+## Environment-Specific Issues
+
+### Development Environment
+
+**Hot reload not working**
+```yaml
+# docker-compose.yml
+services:
+  astro-app:
+    volumes:
+      - .:/app:cached  # Enable volume mounting
+      - /app/node_modules  # Prevent node_modules override
+    environment:
+      - NODE_ENV=development
+```
+
+**File permission issues on macOS/Windows**
+```yaml
+# Use specific user ID
+services:
+  astro-app:
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - .:/app:cached
+```
+
+### Production Environment
+
+**Memory issues**
+```yaml
+# Set memory limits
+services:
+  astro-app:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+```
+
+**SSL/TLS issues**
+```nginx
+# nginx.conf
+server {
+    listen 443 ssl;
+    ssl_certificate /etc/ssl/certs/cert.pem;
+    ssl_certificate_key /etc/ssl/private/key.pem;
+    
+    location / {
+        proxy_pass http://astro-app:4321;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+## Common Error Messages and Solutions
+
+### Docker Errors
+
+| Error | Cause | Solution |
+|-------|--------|----------|
+| `docker: command not found` | Docker not installed | Install Docker Desktop or Docker Engine |
+| `permission denied while trying to connect` | User not in docker group | `sudo usermod -aG docker $USER` |
+| `port is already allocated` | Port conflict | Change port or stop conflicting service |
+| `no matching manifest for linux/arm64` | Platform mismatch | Use `--platform linux/amd64` |
+
+### Astro Errors
+
+| Error | Cause | Solution |
+|-------|--------|----------|
+| `Cannot find module` | Missing dependency | `npm install <package>` |
+| `Invalid component` | Component syntax error | Check component imports and syntax |
+| `Failed to load` | File not found | Check file paths and extensions |
+| `Build failed` | Configuration error | Check astro.config.mjs |
+
+## Debugging Checklist
+
+### Before Starting
+
+- [ ] Docker is installed and running
+- [ ] All dependencies are installed
+- [ ] Environment variables are set correctly
+- [ ] Ports are available
+- [ ] File permissions are correct
+
+### During Build
+
+- [ ] Check build logs for errors
+- [ ] Verify Dockerfile syntax
+- [ ] Check network connectivity
+- [ ] Monitor resource usage
+
+### After Deployment
+
+- [ ] Test all endpoints
+- [ ] Check container health
+- [ ] Verify environment variables
+- [ ] Monitor performance metrics
+
+## Tools and Utilities
+
+### Docker Tools
+
+```bash
+# Docker Compose V2 (recommended)
+docker compose version
+
+# Docker BuildKit
+export DOCKER_BUILDKIT=1
+
+# Docker Desktop for GUI management
+# Alternative: Portainer for web interface
+```
+
+### Astro Tools
+
+```bash
+# Astro CLI
+npx astro --help
+
+# Type checking
+npx astro check
+
+# Build analysis
+npx astro build --verbose
+```
+
+### Monitoring Tools
+
+```bash
+# System monitoring
+htop
+iotop
+nethogs
+
+# Docker monitoring
+docker stats
+docker system df
+docker system events
+```
+
+## Best Practices for Prevention
+
+### Development
+
+1. **Use version control** for all configuration files
+2. **Test locally** before building Docker images
+3. **Use environment variables** for configuration
+4. **Implement health checks** for containers
+5. **Monitor resource usage** regularly
+
+### Production
+
+1. **Use multi-stage builds** to reduce image size
+2. **Implement proper logging** for debugging
+3. **Set resource limits** to prevent issues
+4. **Use orchestration tools** for scaling
+5. **Implement backup strategies** for data
+
+## Conclusion
+
+Troubleshooting Docker and Astro issues becomes much easier with a systematic approach. By understanding common problems and their solutions, you can quickly identify and resolve issues, minimizing downtime and frustration.
+
+Remember that most issues fall into predictable categories: permissions, networking, dependencies, and configuration. Having a structured debugging process will help you resolve problems efficiently and keep your development workflow smooth.
+
+## Key Takeaways
+
+1. **Check logs first** - They often contain the exact error
+2. **Verify permissions** - Most Docker issues are permission-related
+3. **Test incrementally** - Make small changes and test each step
+4. **Use proper tools** - Leverage debugging and monitoring tools
+5. **Document solutions** - Keep a record of issues and fixes
+6. **Prevent issues** - Implement best practices to avoid common problems
+
+By following these guidelines, you'll be well-equipped to handle any Docker or Astro issues that come your way.

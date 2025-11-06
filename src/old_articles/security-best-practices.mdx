@@ -1,0 +1,519 @@
+---
+title: "Docker Security Best Practices"
+description: "Learn essential security practices for Docker containers including non-root users, minimal attack surfaces, and production-ready configurations."
+date: "2024-01-17"
+author: "Security Team"
+category: "Security"
+image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&h=600&fit=crop"
+readTime: "8 min read"
+featured: false
+tags: ["security", "docker", "best-practices", "containers", "production"]
+---
+
+# Docker Security Best Practices
+
+## Overview
+
+Security should be a primary consideration when containerizing applications. This guide covers essential security practices for Docker containers, focusing on minimizing attack surfaces and implementing defense-in-depth strategies.
+
+## Core Security Principles
+
+### 1. Non-Root User Execution
+
+**Why it matters**: Running containers as root creates significant security risks. If an attacker compromises your application, they gain root access to the container.
+
+**Implementation**:
+
+```dockerfile
+# Create a non-root user
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/astro astro
+
+# Set up home directory
+RUN mkdir -p /home/astro && \
+    chown astro:nodejs /home/astro
+
+# Switch to non-root user
+USER astro
+
+# Set working directory
+WORKDIR /app
+```
+
+**Benefits**:
+- Reduces privilege escalation risk
+- Limits file system access
+- Contains potential breaches
+- Meets compliance requirements
+
+### 2. Minimal Base Images
+
+**Why it matters**: Larger base images contain more packages, increasing the attack surface.
+
+**Good choices**:
+```dockerfile
+# Alpine Linux - Small and secure
+FROM node:20-alpine
+
+# Debian Slim - Balanced size and compatibility
+FROM node:20-bookworm-slim
+
+# Distroless - Minimal runtime (advanced)
+FROM gcr.io/distroless/nodejs20-debian11
+```
+
+**Image size comparison**:
+
+| Base Image | Size | Use Case |
+|------------|------|----------|
+| `node:20` | ~900MB | Development |
+| `node:20-slim` | ~180MB | Production |
+| `node:20-alpine` | ~160MB | Production (size-critical) |
+| `distroless/nodejs20` | ~50MB | Production (security-critical) |
+
+### 3. Multi-Stage Builds
+
+**Why it matters**: Reduces final image size and removes build tools that could be exploited.
+
+```dockerfile
+# Build stage
+FROM node:20-bookworm AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM node:20-bookworm-slim AS runner
+WORKDIR /app
+
+# Copy only necessary files
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
+
+# No build tools in final image
+USER node
+EXPOSE 3000
+CMD ["node", "dist/index.js"]
+```
+
+**Security benefits**:
+- Removes build dependencies
+- Smaller attack surface
+- Faster deployment
+- Reduced vulnerability exposure
+
+## Advanced Security Practices
+
+### 4. Read-Only Filesystem
+
+**Implementation**:
+
+```dockerfile
+# Set filesystem as read-only
+USER node
+VOLUME ["/tmp", "/var/log"]
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Read-only filesystem
+CMD ["--read-only"]
+```
+
+**Docker Compose configuration**:
+
+```yaml
+services:
+  app:
+    build: .
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/log:noexec,nosuid,size=100m
+    volumes:
+      - ./logs:/var/log:rw
+```
+
+### 5. Resource Limits
+
+**Why it matters**: Prevents DoS attacks and resource exhaustion.
+
+```yaml
+services:
+  app:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'           # Limit CPU usage
+          memory: 512M           # Limit memory
+          pids: 100             # Limit process count
+        reservations:
+          cpus: '0.25'         # Reserve CPU
+          memory: 256M          # Reserve memory
+```
+
+### 6. Network Security
+
+**Isolate containers**:
+
+```yaml
+services:
+  app:
+    networks:
+      - app-network
+    # Don't expose ports externally
+    # Use reverse proxy instead
+  
+  nginx:
+    networks:
+      - app-network
+      - web-network
+    ports:
+      - "80:80"
+      - "443:443"
+```
+
+**Custom network configuration**:
+
+```bash
+# Create isolated network
+docker network create --driver bridge app-network
+
+# Apply network policies
+docker network create --driver bridge --internal internal-network
+```
+
+## Security Hardening Checklist
+
+### Image Security
+
+- [ ] **Use minimal base images**
+- [ ] **Remove unnecessary packages**
+- [ ] **Update base images regularly**
+- [ ] **Scan images for vulnerabilities**
+- [ ] **Use multi-stage builds**
+- [ ] **Set appropriate file permissions**
+
+### Runtime Security
+
+- [ ] **Run as non-root user**
+- [ ] **Implement read-only filesystem**
+- [ ] **Set resource limits**
+- [ ] **Use health checks**
+- [ ] **Isolate networks**
+- [ ] **Limit container capabilities**
+
+### Configuration Security
+
+- [ ] **Use secrets management**
+- [ ] **Enable logging and monitoring**
+- [ ] **Implement proper authentication**
+- [ ] **Use TLS/SSL encryption**
+- [ ] **Configure firewalls**
+- [ ] **Regular security updates**
+
+## Vulnerability Scanning
+
+### Trivy (Recommended)
+
+```bash
+# Install Trivy
+brew install trivy  # macOS
+apt install trivy  # Ubuntu
+
+# Scan image
+trivy image astro-app:latest
+
+# Scan with severity filter
+trivy image --severity HIGH,CRITICAL astro-app:latest
+
+# Generate report
+trivy image --format json --output report.json astro-app:latest
+```
+
+### Docker Scout
+
+```bash
+# Enable Docker Scout
+docker scout enable
+
+# Analyze image
+docker scout cves astro-app:latest
+
+# Compare images
+docker scout compare astro-app:v1.0 astro-app:v1.1
+```
+
+### Snyk
+
+```bash
+# Install Snyk
+npm install -g snyk
+
+# Authenticate
+snyk auth
+
+# Scan Dockerfile
+snyk container test astro-app:latest --file=Dockerfile
+```
+
+## Secrets Management
+
+### Environment Variables (Basic)
+
+```yaml
+services:
+  app:
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - API_KEY=${API_KEY}
+    env_file:
+      - .env.production
+```
+
+### Docker Secrets (Advanced)
+
+```yaml
+services:
+  app:
+    secrets:
+      - database_url
+      - api_key
+    environment:
+      - DATABASE_URL=/run/secrets/database_url
+      - API_KEY=/run/secrets/api_key
+
+secrets:
+  database_url:
+    external: true
+  api_key:
+    external: true
+```
+
+### External Secret Management
+
+```yaml
+services:
+  app:
+    environment:
+      - VAULT_ADDR=${VAULT_ADDR}
+      - VAULT_TOKEN=${VAULT_TOKEN}
+    command: >
+      sh -c "
+        export DATABASE_URL=$(vault kv get -field=value secret/db_url);
+        export API_KEY=$(vault kv get -field=value secret/api_key);
+        npm start
+      "
+```
+
+## Monitoring and Logging
+
+### Security Monitoring
+
+```yaml
+services:
+  app:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "security,app"
+    
+    # Security monitoring sidecar
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+```
+
+### Log Analysis
+
+```bash
+# Monitor container logs for security events
+docker logs app | grep -i "error\|warning\|failed\|denied"
+
+# Real-time monitoring
+docker logs -f app | grep --line-buffered -i "security\|auth\|login"
+
+# Export logs for analysis
+docker logs app > security-audit.log
+```
+
+## Compliance and Auditing
+
+### CIS Docker Benchmark
+
+```bash
+# Run Docker Bench Security
+git clone https://github.com/docker/docker-bench-security.git
+cd docker-bench-security
+sh docker-bench-security.sh
+```
+
+### Key CIS Controls
+
+| Control | Implementation |
+|---------|----------------|
+| **2.1** - Remove non-essential services | Use minimal base images |
+| **2.2** - Use specific image tags | Pin to specific versions |
+| **4.1** - Run as non-root | Create and use non-root user |
+| **5.1** - Limit network exposure | Use internal networks |
+| **5.7** - Use resource limits | Set CPU/memory limits |
+
+### Audit Trail
+
+```yaml
+services:
+  app:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+        labels: "com.docker.compose.project,com.docker.compose.service"
+    
+    # Enable audit logging
+    security_opt:
+      - label=type:container_runtime_t
+```
+
+## Production Security Configuration
+
+### Complete Dockerfile Example
+
+```dockerfile
+# Use minimal base image
+FROM node:20-bookworm-slim AS base
+
+# Create non-root user
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/nodejs nodejs && \
+    mkdir -p /home/nodejs && \
+    chown nodejs:nodejs /home/nodejs
+
+# Install dependencies
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Build application
+FROM base AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+
+# Copy production dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+
+# Set permissions
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Expose port
+EXPOSE 3000
+
+# Security options
+USER nodejs
+CMD ["node", "dist/index.js"]
+```
+
+### Docker Compose Security
+
+```yaml
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+          pids: 100
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    
+    # Network isolation
+    networks:
+      - app-network
+    
+    # Read-only filesystem
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  app-network:
+    driver: bridge
+    internal: true
+```
+
+## Conclusion
+
+Implementing these Docker security best practices significantly reduces your application's attack surface and provides multiple layers of defense. Security is an ongoing process that requires continuous monitoring, updating, and improvement.
+
+Remember that security is about layers - no single practice provides complete protection. By implementing multiple security measures, you create a defense-in-depth strategy that protects your applications even if one layer is compromised.
+
+## Key Takeaways
+
+1. **Always run as non-root** - This is the most important security practice
+2. **Use minimal base images** - Reduce the attack surface
+3. **Implement multi-stage builds** - Remove build tools from production
+4. **Set resource limits** - Prevent DoS attacks
+5. **Use read-only filesystems** - Limit write access
+6. **Regularly scan for vulnerabilities** - Stay ahead of threats
+7. **Implement proper logging** - Monitor for security events
+8. **Use secrets management** - Never hardcode sensitive data
+
+By following these practices, you'll create secure, production-ready Docker containers that meet enterprise security standards and protect your applications from common threats.

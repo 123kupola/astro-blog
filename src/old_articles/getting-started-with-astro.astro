@@ -1,0 +1,152 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SITE } from '../../config.mjs';
+
+// Sample blog post data - in a real app, this would come from a CMS or markdown files
+const post = {
+  title: "Getting Started with Astro",
+  description: "Learn how to build lightning-fast websites with Astro's modern architecture.",
+  date: "2024-01-15",
+  author: "Tech Team",
+  category: "Tutorial",
+  image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=600&fit=crop",
+  readTime: "5 min read",
+  content: `
+    <h2>What is Astro?</h2>
+    <p>Astro is a modern static site builder that delivers lightning-fast performance with an incredible developer experience. It's designed to help you build content-focused websites with minimal JavaScript.</p>
+    
+    <h3>Key Features</h3>
+    <ul>
+      <li><strong>Island Architecture:</strong> Only ship the JavaScript you need</li>
+      <li><strong>Zero JavaScript by Default:</strong> Fast loading times out of the box</li>
+      <li><strong>UI Framework Agnostic:</strong> Use React, Vue, Svelte, or any framework</li>
+      <li><strong>Edge-Ready:</strong> Deploy anywhere with minimal configuration</li>
+    </ul>
+    
+    <h3>Getting Started</h3>
+    <p>Starting a new Astro project is as simple as running a single command:</p>
+    <pre><code>npm create astro@latest</code></pre>
+    
+    <p>This will guide you through the setup process, allowing you to choose your preferred tools and frameworks.</p>
+    
+    <h3>Project Structure</h3>
+    <p>Astro projects follow a simple, intuitive structure:</p>
+    <pre><code>src/
+├── components/
+├── layouts/
+├── pages/
+└── styles/</code></pre>
+    
+    <h3>Building Your First Page</h3>
+    <p>Pages in Astro are simple files that live in the <code>src/pages</code> directory. Each file becomes a route in your application.</p>
+    
+    <h3>Conclusion</h3>
+    <p>Astro represents the future of web development, combining the best of static sites with modern development practices. Give it a try and experience the difference!</p>
+  `
+};
+---
+
+<Layout title={post.title + " - " + SITE.title} description={post.description}>
+  <main class="relative">
+    <!-- Article Header -->
+    <article class="relative">
+      <div class="relative h-96 overflow-hidden">
+        <img 
+          src={post.image} 
+          alt={post.title}
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-8">
+          <div class="container mx-auto">
+            <div class="max-w-4xl mx-auto">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">
+                  {post.category}
+                </span>
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-xs font-medium">
+                  {post.readTime}
+                </span>
+              </div>
+              <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                {post.title}
+              </h1>
+              <div class="flex items-center space-x-4 text-white/90">
+                <span>{post.author}</span>
+                <span>•</span>
+                <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article Content -->
+      <div class="py-16">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto">
+            <div class="prose prose-lg max-w-none dark:prose-invert">
+              <div set:html={post.content} />
+            </div>
+            
+            <!-- Article Footer -->
+            <div class="mt-16 pt-8 border-t border-border">
+              <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-4">
+                  <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold">TT</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">{post.author}</div>
+                    <div class="text-sm text-muted-foreground">Tech Team</div>
+                  </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326"></path>
+                    </svg>
+                  </button>
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Related Posts -->
+            <div class="mt-16">
+              <h3 class="text-2xl font-bold mb-8 text-gradient">Related Articles</h3>
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Modern CSS Techniques</h4>
+                    <p class="text-sm text-muted-foreground">Explore glass morphism and animations</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">TypeScript Fundamentals</h4>
+                    <p class="text-sm text-muted-foreground">Master type-safe JavaScript</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-blue-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Performance Tips</h4>
+                    <p class="text-sm text-muted-foreground">Optimize your web applications</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</Layout>

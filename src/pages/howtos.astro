@@ -1,0 +1,189 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../config';
+
+// Fetch all howtos from the content collection
+const allHowtos = await getCollection('howtos');
+
+// Filter published howtos
+const publishedHowtos = allHowtos.filter(howto => howto.data.published);
+
+// Map the howto data to the expected format and sort by date
+const howtos = publishedHowtos.map((howto) => ({
+  title: howto.data.title || 'Untitled Howto',
+  description: howto.data.description || '',
+  date: new Date(howto.data.date).toISOString(),
+  author: howto.data.author || 'Tech Team',
+  category: howto.data.tags ? howto.data.tags[0] : 'Tutorial',
+  image: howto.data.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop',
+  difficulty: howto.data.difficulty || 'beginner',
+  timeRequired: howto.data.timeRequired || '15 min read',
+  featured: howto.data.featured || false,
+  url: `/howtos/${howto.slug}`
+})).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+// Separate featured howtos from regular howtos
+const featuredHowto = howtos.find(howto => howto.featured);
+const regularHowtos = howtos.filter(howto => howto !== featuredHowto);
+
+// Difficulty color mapping
+const getDifficultyColor = (difficulty: string) => {
+  switch (difficulty) {
+    case 'beginner': return 'from-green-500/10 to-emerald-500/10 text-green-600 dark:text-green-400 border-green-500/20';
+    case 'intermediate': return 'from-yellow-500/10 to-orange-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20';
+    case 'advanced': return 'from-red-500/10 to-pink-500/10 text-red-600 dark:text-red-400 border-red-500/20';
+    default: return 'from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
+  }
+};
+---
+
+<Layout title={`Howtos - ${siteConfig.title}`} description="Step-by-step guides and tutorials to help you master web development and deployment">
+  <main class="relative">
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20"></div>
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-3xl md:text-5xl font-bold mb-6 text-gradient animate-gradient">
+            How-To Guides
+          </h1>
+          <hr class="w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-8 border-0">
+          <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Practical tutorials and step-by-step guides to help you build, deploy, and optimize your applications
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Howto -->
+    {featuredHowto && (
+      <section class="py-12 relative">
+        <div class="container mx-auto px-4">
+          <div class="max-w-6xl mx-auto">
+            <a href={featuredHowto.url} class="relative group block">
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl transform group-hover:scale-[1.02] transition-transform"></div>
+              <div class="relative bg-background/80 backdrop-blur-sm border border-border/50 rounded-3xl overflow-hidden">
+                <div class="md:flex">
+                  <div class="md:w-1/2">
+                    <img
+                      src={featuredHowto.image}
+                      alt={featuredHowto.title}
+                      class="w-full h-64 md:h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="md:w-1/2 p-8 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-4">
+                      <span class="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">
+                        Featured
+                      </span>
+                      <span class={`px-3 py-1 bg-gradient-to-r ${getDifficultyColor(featuredHowto.difficulty)} rounded-full text-xs font-medium border`}>
+                        {featuredHowto.difficulty.charAt(0).toUpperCase() + featuredHowto.difficulty.slice(1)}
+                      </span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 text-gradient">
+                      {featuredHowto.title}
+                    </h2>
+                    <p class="text-muted-foreground mb-6 line-clamp-3">
+                      {featuredHowto.description}
+                    </p>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span>{featuredHowto.author}</span>
+                        <span>•</span>
+                        <span>{new Date(featuredHowto.date).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{featuredHowto.timeRequired}</span>
+                      </div>
+                      <div class="relative px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group-hover:opacity-100 overflow-hidden inline-block">
+                        <span class="relative z-10">Read Guide</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Howtos Grid -->
+    <section class="py-12 relative">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {regularHowtos.map((howto) => (
+              <article>
+                <a href={howto.url} class="relative group block h-full">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
+                    <div class="aspect-video overflow-hidden">
+                      <img
+                        src={howto.image}
+                        alt={howto.title}
+                        class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                      <div class="flex items-center gap-2 mb-3">
+                        <span class={`px-2 py-1 bg-gradient-to-r ${getDifficultyColor(howto.difficulty)} rounded-full text-xs font-medium border`}>
+                          {howto.difficulty.charAt(0).toUpperCase() + howto.difficulty.slice(1)}
+                        </span>
+                        <span class="text-xs text-muted-foreground">{howto.timeRequired}</span>
+                      </div>
+                      <h3 class="text-xl font-semibold mb-3 group-hover:text-gradient transition-colors flex-grow">
+                        {howto.title}
+                      </h3>
+                      <p class="text-muted-foreground mb-4 line-clamp-2">
+                        {howto.description}
+                      </p>
+                      <div class="flex items-center justify-between mt-auto">
+                        <div class="text-sm text-muted-foreground">
+                          {new Date(howto.date).toLocaleDateString()}
+                        </div>
+                        <div class="flex items-center space-x-1 text-primary group-hover:text-primary/80 transition-colors">
+                          <span class="text-sm font-medium">Read Guide</span>
+                          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    {howtos.length === 0 && (
+      <section class="py-20 relative">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-4 text-gradient">Coming Soon</h2>
+            <p class="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              We're working on comprehensive how-to guides to help you master web development and deployment. Check back soon for detailed tutorials!
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/" class="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group overflow-hidden inline-block">
+                <span class="relative z-10">Back to Home</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </a>
+              <a href="/blog" class="relative px-8 py-4 bg-background border border-border rounded-xl hover:bg-muted hover:scale-105 transition-all duration-300 group inline-block">
+                <span class="relative z-10">Read Our Blog</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+</Layout>

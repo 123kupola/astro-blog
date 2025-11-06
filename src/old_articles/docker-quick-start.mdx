@@ -1,0 +1,518 @@
+---
+title: "Docker Quick Start Guide"
+description: "Get up and running with Docker in minutes. Learn the essential commands and workflows for containerizing your applications."
+date: "2024-01-16"
+author: "DevOps Team"
+category: "Tutorial"
+image: "https://images.unsplash.com/photo-1603811176569-355a8b1f6c5a?w=1200&h=600&fit=crop"
+readTime: "6 min read"
+featured: false
+tags: ["docker", "quick-start", "tutorial", "containers", "beginner"]
+---
+
+# Docker Quick Start Guide
+
+## Overview
+
+Docker revolutionizes how we build, ship, and run applications. This guide will get you up and running with Docker in minutes, covering the essential commands and workflows you need to know.
+
+## Prerequisites
+
+Before we begin, make sure you have:
+
+- **Docker Desktop** (macOS/Windows) or **Docker Engine** (Linux)
+- **Node.js 20+** (for local development)
+- **Basic command line knowledge**
+
+### Installing Docker
+
+#### macOS
+
+```bash
+# Download Docker Desktop for Mac
+# https://www.docker.com/products/docker-desktop/
+
+# Or install with Homebrew
+brew install --cask docker
+
+# Start Docker Desktop
+open /Applications/Docker.app
+```
+
+#### Windows
+
+```powershell
+# Download Docker Desktop for Windows
+# https://www.docker.com/products/docker-desktop/
+
+# Or install with Chocolatey
+choco install docker-desktop
+
+# Start Docker Desktop from Start Menu
+```
+
+#### Linux (Ubuntu/Debian)
+
+```bash
+# Update package index
+sudo apt-get update
+
+# Install Docker
+sudo apt-get install docker.io docker-compose-plugin
+
+# Start and enable Docker service
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Add your user to docker group
+sudo usermod -aG docker $USER
+
+# Log out and back in for group changes to take effect
+```
+
+## Quick Start with Docker Compose (Recommended)
+
+Docker Compose is the easiest way to get started with multi-container applications.
+
+### Step 1: Clone and Navigate to Project
+
+```bash
+# Clone your repository
+git clone <your-repo-url>
+cd astro
+
+# Verify project structure
+ls -la
+```
+
+You should see a structure like this:
+
+```
+astro/
+├── src/
+├── Dockerfile
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
+
+### Step 2: Build and Run with Docker Compose
+
+```bash
+# Build and start all services
+docker compose up --build
+
+# Or run in detached mode (background)
+docker compose up -d --build
+```
+
+### Step 3: Access Your Application
+
+Open your browser and navigate to:
+- **Application**: `http://localhost:4321`
+
+### Step 4: Verify Everything is Working
+
+```bash
+# Check running containers
+docker compose ps
+
+# View logs
+docker compose logs -f
+
+# Check application health
+curl http://localhost:4321
+```
+
+## Using Docker Directly
+
+If you prefer to use Docker commands directly, here's how:
+
+### Step 1: Build the Docker Image
+
+```bash
+# Build the image with a tag
+docker build -t astro-modular-demo .
+
+# Build with no cache (force rebuild)
+docker build --no-cache -t astro-modular-demo .
+
+# Build with build arguments
+docker build --build-arg NODE_ENV=production -t astro-modular-demo .
+```
+
+### Step 2: Run the Container
+
+```bash
+# Basic container run
+docker run -p 4321:4321 astro-modular-demo
+
+# Run with environment variables
+docker run -p 4321:4321 \
+  -e NODE_ENV=production \
+  -e SITE_URL=http://localhost:4321 \
+  astro-modular-demo
+
+# Run in detached mode
+docker run -d -p 4321:4321 --name astro-app astro-modular-demo
+
+# Run with volume mounts (for development)
+docker run -p 4321:4321 \
+  -v $(pwd):/app \
+  -v /app/node_modules \
+  astro-modular-demo
+```
+
+### Step 3: Access Your Application
+
+Open your browser and navigate to `http://localhost:4321`
+
+## Essential Docker Commands
+
+### Container Management
+
+```bash
+# List running containers
+docker ps
+
+# List all containers (including stopped)
+docker ps -a
+
+# Stop a running container
+docker stop <container_id>
+
+# Start a stopped container
+docker start <container_id>
+
+# Remove a container
+docker rm <container_id>
+
+# Force remove a running container
+docker rm -f <container_id>
+```
+
+### Image Management
+
+```bash
+# List local images
+docker images
+
+# Remove an image
+docker rmi <image_id>
+
+# Remove all unused images
+docker image prune
+
+# Pull an image from registry
+docker pull node:20-alpine
+
+# Push an image to registry
+docker push username/repository:tag
+```
+
+### Log and Debug Commands
+
+```bash
+# View container logs
+docker logs <container_id>
+
+# Follow logs in real-time
+docker logs -f <container_id>
+
+# Show last 50 lines
+docker logs --tail 50 <container_id>
+
+# Execute commands in running container
+docker exec -it <container_id> /bin/bash
+
+# Inspect container details
+docker inspect <container_id>
+```
+
+## Docker Compose Commands
+
+### Basic Workflow
+
+```bash
+# Start services
+docker compose up
+
+# Start in detached mode
+docker compose up -d
+
+# Build and start
+docker compose up --build
+
+# Stop services
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+
+# Rebuild specific service
+docker compose up --build app
+```
+
+### Development Workflow
+
+```bash
+# Start with live reload
+docker compose up --build
+
+# View logs for specific service
+docker compose logs -f app
+
+# Scale services
+docker compose up --scale app=3
+
+# Run one-off commands
+docker compose run app npm install
+
+# Execute in service
+docker compose exec app /bin/bash
+```
+
+### Production Workflow
+
+```bash
+# Start with production profile
+docker compose --profile production up -d
+
+# Pull latest images
+docker compose pull
+
+# Update services
+docker compose up -d --force-recreate
+
+# Backup volumes
+docker run --rm -v astro_data:/data -v $(pwd):/backup alpine tar czf /backup/data-backup.tar.gz -C /data .
+```
+
+## Environment Configuration
+
+### Environment Variables
+
+Create a `.env` file for local development:
+
+```bash
+# .env
+NODE_ENV=development
+SITE_URL=http://localhost:4321
+SITE_NAME=Astro Modular Demo
+SITE_DESCRIPTION=A flexible blog theme designed for Obsidian users
+```
+
+### Docker Compose Environment
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - SITE_URL=${SITE_URL:-http://localhost:4321}
+      - SITE_NAME=${SITE_NAME:-Astro App}
+    env_file:
+      - .env
+```
+
+### Production Environment
+
+```bash
+# Set environment variables for production
+export NODE_ENV=production
+export SITE_URL=https://yourdomain.com
+export SITE_NAME=Production App
+
+# Or use .env.production file
+docker compose --env-file .env.production up -d
+```
+
+## Development with Docker
+
+### Live Reload Setup
+
+For development with live reload, uncomment volume mounts in `docker-compose.yml`:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app                    # Mount source code
+      - /app/node_modules          # Prevent node_modules override
+      - /app/dist                 # Prevent dist override
+      - /app/.astro              # Prevent .astro override
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+```
+
+### Hot Module Replacement
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app:cached            # Use cached volume for better performance
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # Enable file watching in Docker
+    command: npm run dev
+```
+
+## Common Docker Compose Patterns
+
+### Multi-Stage Development
+
+```yaml
+services:
+  app:
+    build:
+      context: .
+      target: builder            # Use builder stage for development
+    volumes:
+      - .:/app
+    command: npm run dev
+
+  app-prod:
+    build:
+      context: .
+      target: runner            # Use runner stage for production
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=production
+```
+
+### Service Dependencies
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - "4321:4321"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/app
+      - REDIS_URL=redis://redis:6379
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+## Troubleshooting Quick Fixes
+
+### Port Already in Use
+
+```bash
+# Check what's using the port
+lsof -i :4321
+
+# Kill the process
+kill -9 <PID>
+
+# Or use a different port
+docker run -p 4322:4321 astro-modular-demo
+```
+
+### Permission Issues
+
+```bash
+# Fix Docker socket permissions
+sudo chmod 666 /var/run/docker.sock
+
+# Or add user to docker group
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### Build Issues
+
+```bash
+# Clean build
+docker compose down
+docker compose build --no-cache
+docker compose up
+
+# Clear Docker cache
+docker system prune -a
+```
+
+## Best Practices
+
+### Development
+
+1. **Use .dockerignore** to exclude unnecessary files
+2. **Mount volumes** for live reload
+3. **Use environment files** for configuration
+4. **Enable health checks** for monitoring
+
+### Production
+
+1. **Use specific image tags** (not `latest`)
+2. **Implement resource limits**
+3. **Use read-only filesystems**
+4. **Set up proper logging**
+5. **Monitor container health**
+
+### Security
+
+1. **Run as non-root user**
+2. **Use minimal base images**
+3. **Scan images for vulnerabilities**
+4. **Use secrets management**
+5. **Network isolation**
+
+## Next Steps
+
+Now that you have Docker running, you can:
+
+1. **Explore Docker Hub** for pre-built images
+2. **Learn about Docker Swarm** for orchestration
+3. **Try Kubernetes** for advanced orchestration
+4. **Set up CI/CD pipelines** with Docker
+5. **Implement monitoring** and logging solutions
+
+## Conclusion
+
+Docker simplifies application deployment and ensures consistency across environments. With these essential commands and workflows, you're ready to containerize your applications and take advantage of Docker's powerful ecosystem.
+
+Remember that Docker is a tool that solves specific problems - use it when it makes sense for your workflow, and don't be afraid to start simple and add complexity as needed.
+
+## Key Takeaways
+
+1. **Docker Compose** is the easiest way to start
+2. **Volume mounts** enable live reload for development
+3. **Environment variables** configure different environments
+4. **Health checks** ensure your application is running properly
+5. **Security best practices** should be implemented from the start
+6. **Monitoring and logging** are essential for production
+
+You now have the foundation to build, ship, and run applications with Docker confidently!

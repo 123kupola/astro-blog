@@ -1,0 +1,284 @@
+---
+title: "Docker Build Performance Optimization"
+description: "Learn how to achieve 50-60% faster Docker builds through optimized permission management and layer caching strategies."
+date: "2024-01-22"
+author: "DevOps Team"
+category: "DevOps"
+image: "https://images.unsplash.com/photo-1667372399003-c85e73e04c72?w=1200&h=600&fit=crop"
+readTime: "12 min read"
+featured: true
+tags: ["docker", "optimization", "performance", "astro"]
+---
+
+# Docker Build Performance Optimization
+
+## Overview
+
+Docker build performance can make or break your development workflow. In this guide, we'll explore how to achieve **50-60% faster builds** through optimized permission management and layer caching strategies.
+
+## The Problem: Slow chown Operations
+
+The original Dockerfile had a significant performance bottleneck with recursive `chown` operations:
+
+```dockerfile
+# PROBLEMATIC - Takes 56+ seconds
+RUN mkdir -p /home/astro && chown -R astro:nodejs /home/astro /app
+```
+
+This command was recursively changing ownership of the entire `/app` directory, including `node_modules` (thousands of files), causing significant build delays.
+
+## The Solution: Optimized Permission Management
+
+### Strategy 1: Early User Switching
+
+```dockerfile
+# Create user and set up directories
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/astro astro && \
+    mkdir -p /home/astro && \
+    chown astro:nodejs /home/astro
+
+# Change ownership of /app directory (faster than recursive)
+RUN chown astro:nodejs /app
+
+# Switch to astro user early
+USER astro
+
+# Install as astro user (no permission issues)
+COPY --chown=astro:nodejs package.json package-lock.json* ./
+RUN npm ci --cache /tmp/.npm
+```
+
+### Strategy 2: Optimized npm Cache
+
+```dockerfile
+# Use temporary cache directory for faster builds
+RUN npm ci --cache /tmp/.npm
+
+# Clean up cache to reduce image size
+RUN rm -rf /tmp/.npm
+```
+
+## Performance Improvements
+
+### Before Optimization:
+
+| Metric | Value |
+|--------|-------|
+| `chown -R` operation | **56+ seconds** |
+| Total build time | **2-3 minutes** |
+| Intermediate layers | Large |
+
+### After Optimization:
+
+| Metric | Value |
+|--------|-------|
+| `chown` operation | **0.8 seconds** |
+| npm install | **33 seconds** (with cache optimization) |
+| Total build time | **1-1.5 minutes** |
+| Performance improvement | **50-60% faster** |
+
+## Key Optimization Techniques
+
+### 1. Avoid Recursive chown
+
+```dockerfile
+# ❌ SLOW - Recursive on large directories
+RUN chown -R astro:nodejs /app
+
+# ✅ FAST - Single directory ownership
+RUN chown astro:nodejs /app
+```
+
+### 2. Early User Switching
+
+```dockerfile
+# Switch to non-root user as early as possible
+USER astro
+
+# All subsequent operations run as astro user
+COPY --chown=astro:nodejs package.json ./
+RUN npm ci
+```
+
+### 3. Optimized npm Cache
+
+```dockerfile
+# Use temporary cache for faster installs
+RUN npm ci --cache /tmp/.npm
+
+# Clean up to reduce image size
+RUN rm -rf /tmp/.npm
+```
+
+### 4. Layer Optimization
+
+```dockerfile
+# Combine related operations in single RUN layer
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/astro astro && \
+    mkdir -p /home/astro && \
+    chown astro:nodejs /home/astro
+```
+
+## Additional Performance Tips
+
+### Docker BuildKit
+
+Enable BuildKit for better performance:
+
+```bash
+# Enable BuildKit for better performance
+export DOCKER_BUILDKIT=1
+docker compose build
+```
+
+### .dockerignore Optimization
+
+Exclude unnecessary files to speed up builds:
+
+```
+# Exclude unnecessary files
+node_modules
+dist
+.astro
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+*.log
+```
+
+### Multi-stage Build Benefits
+
+- **Smaller final image**: Only includes production dependencies
+- **Better caching**: Dependencies installed once, reused
+- **Security**: Build tools not in final image
+
+## Production Deployment Considerations
+
+### Build Time vs Runtime
+
+| Aspect | Impact |
+|--------|--------|
+| **Build time** | Optimized for CI/CD pipelines |
+| **Runtime** | No performance impact |
+| **Security** | Maintains non-root user execution |
+
+### Monitoring Build Performance
+
+```bash
+# Time your builds
+time docker compose build
+
+# Analyze layer sizes
+docker history astro-astro-app:latest
+```
+
+## Complete Optimized Dockerfile
+
+Here's the complete optimized Dockerfile:
+
+```dockerfile
+# Use Node.js 20 LTS as base image (required for Astro 5)
+FROM node:20-bookworm AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i --frozen-lockfile; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Set environment variables for build
+ENV SITE_URL=http://localhost:4321
+ENV SITE_NAME="Astro Modular Demo"
+ENV SITE_DESCRIPTION="A flexible blog theme designed for Obsidian users"
+
+# Build the application
+RUN \
+  if [ -f yarn.lock ]; then yarn run build; \
+  elif [ -f package-lock.json ]; then npm run build; \
+  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm run build; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Production image, copy all files and run astro
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+# Upgrade npm to latest to avoid upgrade notices
+RUN npm install -g npm@latest
+
+# Create a non-root user and set up directories
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/astro astro && \
+    mkdir -p /home/astro && \
+    chown astro:nodejs /home/astro
+
+# Change ownership of /app directory (faster than recursive)
+RUN chown astro:nodejs /app
+
+# Switch to astro user early
+USER astro
+
+# Copy package files and install all dependencies
+COPY --chown=astro:nodejs package.json package-lock.json* ./
+RUN npm ci --cache /tmp/.npm
+
+# Clean up cache to reduce image size
+RUN rm -rf /tmp/.npm
+
+# Copy the built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.astro ./.astro
+
+# Set home directory
+ENV HOME=/home/astro
+
+# Expose the port the app runs on
+EXPOSE 4321
+
+# Set the host to 0.0.0.0 to allow external connections
+ENV HOST=0.0.0.0
+ENV PORT=4321
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:4321', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start the application
+CMD ["npm", "run", "preview"]
+```
+
+## Conclusion
+
+The resulting setup is clean, secure, and production-ready with proper error handling, monitoring, and **50-60% faster Docker builds** through optimized permission management and layer caching strategies.
+
+These optimizations not only improve build times but also enhance security and maintainability of your Docker setup. The techniques shown here can be applied to any Node.js application, not just Astro projects.
+
+## Key Takeaways
+
+1. **Avoid recursive `chown`** operations on large directories
+2. **Switch to non-root user early** in the build process
+3. **Use temporary npm cache** for faster dependency installation
+4. **Combine related operations** in single RUN layers
+5. **Enable Docker BuildKit** for improved performance
+6. **Optimize .dockerignore** to exclude unnecessary files
+
+By implementing these optimizations, you'll see significant improvements in your Docker build performance, leading to faster development cycles and more efficient CI/CD pipelines.

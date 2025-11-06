@@ -1,0 +1,16 @@
+---
+import { YouTube } from '@astro-community/astro-embed-youtube';
+
+export interface Props {
+  id: string;
+  posterQuality?: 'max' | 'high' | 'default' | 'low';
+  params?: string;
+  playlabel?: string;
+  title?: string;
+  poster?: string;
+}
+
+const { id, ...props } = Astro.props;
+---
+
+<YouTube id={id} {...props} />

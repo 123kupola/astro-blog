@@ -1,0 +1,459 @@
+---
+title: "YouTube Embed Integration"
+description: "Learn how to implement performance-optimized YouTube embeds using lite-youtube-embed for faster loading and better user experience."
+date: "2024-01-19"
+author: "Tech Team"
+category: "Tutorial"
+image: "https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=1200&h=600&fit=crop"
+readTime: "8 min read"
+featured: false
+tags: ["youtube", "performance", "embed", "optimization", "accessibility"]
+---
+
+# YouTube Embed Integration
+
+## Overview
+
+Integrating YouTube videos into your web application can significantly impact page performance. This guide shows how to implement performance-optimized YouTube embeds that load instantly and provide an excellent user experience.
+
+## The Problem: astro-embed Compatibility Issues
+
+The `astro-embed` package had compatibility issues with the current Astro version, causing "InvalidComponentArgs" errors:
+
+```javascript
+// ❌ Problematic approach
+import { YouTube } from 'astro-embed';
+
+<YouTube id="dQw4w9WgXcQ" />
+```
+
+This approach resulted in build failures and runtime errors due to component incompatibility.
+
+## The Solution: lite-youtube-embed Direct Integration
+
+### Install the Package
+
+```bash
+npm install lite-youtube-embed
+```
+
+### Add to Astro Page
+
+```astro
+---
+import Layout from '../layouts/Layout.astro';
+import { SITE } from '../config.mjs';
+---
+
+<Layout title={SITE.title} description={SITE.description}>
+  <main class="container mx-auto px-4 py-8">
+    <div class="prose prose-lg max-w-none dark:prose-invert">
+      <h2>YouTube Embed Example</h2>
+      
+      <!-- Lite YouTube Embed -->
+      <lite-youtube 
+        videoid="dQw4w9WgXcQ" 
+        playlabel="Play video: Video Title"
+        style={`background-image: url('https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg');`}>
+      </lite-youtube>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import 'lite-youtube-embed';
+</script>
+```
+
+## CSS Styling Implementation
+
+### Core Styles
+
+```css
+/* src/styles/global.css */
+lite-youtube {
+  background-color: #000;
+  position: relative;
+  display: block;
+  contain: content;
+  background-position: center center;
+  background-size: cover;
+  cursor: pointer;
+  max-width: 720px;
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+```
+
+### Hover Effects
+
+```css
+lite-youtube::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.3);
+  transition: background 200ms;
+}
+
+lite-youtube:hover::before {
+  background: rgba(0,0,0,0);
+}
+```
+
+### Play Button Styling
+
+```css
+lite-youtube::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 68px;
+  height: 48px;
+  margin-left: -34px;
+  margin-top: -24px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 48"><path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.64 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/><path d="M45 24 27 14v20z" fill="white"/></svg>') 0 0 no-repeat;
+  background-color: transparent;
+}
+```
+
+### Dark Mode Support
+
+```css
+/* Dark mode support */
+.dark lite-youtube {
+  border: 1px solid hsl(var(--border));
+}
+```
+
+## Benefits of lite-youtube-embed
+
+| Feature | Benefit |
+|---------|---------|
+| **Performance Optimized** | Only loads YouTube iframe when clicked |
+| **Lightweight** | No heavy JavaScript dependencies |
+| **Accessible** | Proper ARIA labels and keyboard navigation |
+| **Responsive** | Adapts to different screen sizes |
+| **Fast Loading** | Poster image loads immediately |
+
+## Advanced Implementation
+
+### Custom YouTube Component
+
+Create a reusable YouTube component for your Astro project:
+
+```astro
+---
+// src/components/YouTube.astro
+export interface Props {
+  videoId: string;
+  title?: string;
+  playLabel?: string;
+  posterImage?: string;
+  class?: string;
+}
+
+const { 
+  videoId, 
+  title = "YouTube video", 
+  playLabel,
+  posterImage = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+  class: className = ""
+} = Astro.props;
+---
+
+<lite-youtube 
+  videoid={videoId}
+  title={title}
+  playlabel={playLabel || `Play video: ${title}`}
+  style={`background-image: url('${posterImage}');`}
+  class={className}
+></lite-youtube>
+```
+
+### Usage Examples
+
+```astro
+---
+import YouTube from '../components/YouTube.astro';
+---
+
+<!-- Basic usage -->
+<YouTube videoId="dQw4w9WgXcQ" title="Sample Video" />
+
+<!-- With custom poster -->
+<YouTube 
+  videoId="your-video-id" 
+  title="Custom Title"
+  posterImage="https://your-custom-image.jpg"
+/>
+
+<!-- With custom styling -->
+<YouTube 
+  videoId="your-video-id"
+  class="rounded-lg shadow-lg"
+/>
+```
+
+## Performance Comparison
+
+### Traditional YouTube Embed
+
+```html
+<!-- ❌ Heavy and slow -->
+<iframe 
+  width="560" 
+  height="315" 
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+  allowfullscreen>
+</iframe>
+```
+
+**Issues:**
+- Loads ~2MB of JavaScript on page load
+- Blocks page rendering
+- Poor performance on mobile
+- No control over appearance
+
+### Lite YouTube Embed
+
+```html
+<!-- ✅ Fast and lightweight -->
+<lite-youtube videoid="dQw4w9WgXcQ"></lite-youtube>
+```
+
+**Benefits:**
+- Loads only ~50KB of CSS
+- No JavaScript until user interaction
+- Instant page load
+- Customizable appearance
+- Better mobile performance
+
+## Integration with Astro
+
+### Component Registration
+
+Make sure to register the custom element in your Astro layout:
+
+```astro
+---
+// src/layouts/Layout.astro
+---
+
+<html lang="en">
+  <head>
+    <!-- Other head elements -->
+  </head>
+  <body>
+    <slot />
+    
+    <!-- Load lite-youtube-embed -->
+    <script>
+      import 'lite-youtube-embed';
+    </script>
+  </body>
+</html>
+```
+
+### TypeScript Support
+
+Add type definitions for better development experience:
+
+```typescript
+// src/types/lite-youtube.d.ts
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lite-youtube': {
+        videoid: string;
+        title?: string;
+        playlabel?: string;
+        style?: string;
+        class?: string;
+      };
+    }
+  }
+}
+
+export {};
+```
+
+## Accessibility Features
+
+### Keyboard Navigation
+
+The lite-youtube-embed component includes built-in keyboard support:
+
+- **Tab**: Focuses the embed
+- **Enter/Space**: Activates the video
+- **Escape**: Closes the video (if supported)
+
+### Screen Reader Support
+
+```html
+<lite-youtube 
+  videoid="dQw4w9WgXcQ"
+  title="Video title for screen readers"
+  playlabel="Play video: Video title"
+  role="button"
+  tabindex="0"
+  aria-label="Play YouTube video: Video title">
+</lite-youtube>
+```
+
+## Responsive Design
+
+### Fluid Sizing
+
+```css
+.responsive-youtube {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16/9;
+}
+
+/* For different aspect ratios */
+.vertical-youtube {
+  aspect-ratio: 9/16;
+}
+
+.square-youtube {
+  aspect-ratio: 1/1;
+}
+```
+
+### Container Queries (Modern Approach)
+
+```css
+.youtube-container {
+  container-type: inline-size;
+}
+
+@container (max-width: 400px) {
+  lite-youtube {
+    max-width: 100%;
+    font-size: 14px;
+  }
+}
+```
+
+## Advanced Features
+
+### Custom Thumbnail Quality
+
+```javascript
+// Generate different thumbnail URLs
+const getThumbnailUrl = (videoId, quality = 'hqdefault') => {
+  const qualities = {
+    default: 'default',
+    medium: 'mqdefault', 
+    high: 'hqdefault',
+    maxres: 'maxresdefault'
+  };
+  
+  return `https://i.ytimg.com/vi/${videoId}/${qualities[quality]}.jpg`;
+};
+```
+
+### Video Information API
+
+```javascript
+// Fetch video metadata
+async function getVideoInfo(videoId) {
+  const response = await fetch(
+    `https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`
+  );
+  return await response.json();
+}
+```
+
+### Analytics Integration
+
+```javascript
+// Track video interactions
+document.addEventListener('click', (e) => {
+  if (e.target.closest('lite-youtube')) {
+    const videoId = e.target.closest('lite-youtube').videoid;
+    
+    // Track with Google Analytics
+    gtag('event', 'video_play', {
+      video_id: videoId,
+      video_title: e.target.title
+    });
+  }
+});
+```
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| **Video not loading** | Check video ID format and network connectivity |
+| **Styling not applying** | Ensure CSS is loaded after the component |
+| **JavaScript errors** | Verify lite-youtube-embed is properly imported |
+| **Accessibility issues** | Add proper ARIA labels and keyboard support |
+
+### Debug Mode
+
+```javascript
+// Enable debug mode for troubleshooting
+window.liteYouTubeDebug = true;
+```
+
+## Best Practices
+
+### Performance
+
+1. **Lazy load** video embeds when they come into viewport
+2. **Use appropriate thumbnail quality** based on device capabilities
+3. **Preload critical CSS** for instant rendering
+4. **Minimize JavaScript** until user interaction
+
+### User Experience
+
+1. **Provide clear visual feedback** on hover and focus
+2. **Include loading states** for video initialization
+3. **Support keyboard navigation** for accessibility
+4. **Maintain aspect ratios** across different screen sizes
+
+### SEO
+
+1. **Include structured data** for video content
+2. **Add descriptive titles** and descriptions
+3. **Use appropriate thumbnails** for social sharing
+4. **Provide transcript** when available
+
+## Conclusion
+
+The lite-youtube-embed approach provides a superior solution for integrating YouTube videos into your Astro application. It offers:
+
+- **50x faster page loads** compared to traditional embeds
+- **Better user experience** with instant loading
+- **Improved accessibility** with built-in keyboard support
+- **Responsive design** that works on all devices
+- **Customizable appearance** to match your brand
+
+By implementing this approach, you can significantly improve your site's performance while providing a rich media experience for your users.
+
+## Key Takeaways
+
+1. **Avoid traditional iframe embeds** for better performance
+2. **Use lite-youtube-embed** for optimal loading speed
+3. **Implement proper accessibility** features
+4. **Customize appearance** to match your design
+5. **Track user interactions** for analytics
+6. **Test across devices** for consistent experience
+
+This approach transforms how you handle video content, making your web applications faster, more accessible, and more user-friendly.

@@ -1,0 +1,173 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import SITE from '../config';
+---
+
+<Layout title="About - {SITE.title}" description="Learn more about our cutting-edge Astro application">
+  <main class="relative">
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20"></div>
+      
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6 text-gradient animate-gradient">
+            Our Mission
+          </h1>
+          <hr class="w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-8 border-0">
+          <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Building the future of web development with cutting-edge technology and elegant design
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="py-20 relative">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div class="space-y-6">
+              <h2 class="text-3xl font-bold text-gradient">Our Story</h2>
+              <p class="text-lg text-muted-foreground leading-relaxed">
+                We're passionate about creating exceptional web experiences that combine performance, 
+                accessibility, and stunning design. Our mission is to push the boundaries of what's 
+                possible with modern web technologies.
+              </p>
+              <p class="text-lg text-muted-foreground leading-relaxed">
+                Built with Astro, our application showcases the perfect blend of server-side rendering 
+                and client-side interactivity, delivering lightning-fast load times and smooth user experiences.
+              </p>
+            </div>
+            
+            <div class="relative group">
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+              <div class="relative p-8 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl">
+                <div class="space-y-4">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold">Education First</h3>
+                      <p class="text-sm text-muted-foreground">Empowering developers with knowledge</p>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 7H7v6h6V7z"/>
+                        <path fill-rule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold">Modern Tech Stack</h3>
+                      <p class="text-sm text-muted-foreground">Using cutting-edge tools and frameworks</p>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-blue-600 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 class="font-semibold">User Focused</h3>
+                      <p class="text-sm text-muted-foreground">Creating experiences that matter</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Technology Stack -->
+          <div class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gradient">Technology Stack</h2>
+            <div class="grid md:grid-cols-4 gap-6">
+               <div class="relative group">
+                 <div class="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl transform group-hover:scale-105 transition-transform shadow-lg"></div>
+                 <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl text-center shadow-md">
+                   <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                       <circle cx="12" cy="12" r="10"/>
+                     </svg>
+                   </div>
+                  <h3 class="font-semibold mb-2">Astro</h3>
+                  <p class="text-sm text-muted-foreground">Modern static site generator</p>
+                </div>
+              </div>
+
+               <div class="relative group">
+                 <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-xl transform group-hover:scale-105 transition-transform shadow-lg"></div>
+                 <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl text-center shadow-md">
+                  <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <h3 class="font-semibold mb-2">TypeScript</h3>
+                  <p class="text-sm text-muted-foreground">Type-safe JavaScript</p>
+                </div>
+              </div>
+
+               <div class="relative group">
+                 <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 rounded-xl transform group-hover:scale-105 transition-transform shadow-lg"></div>
+                 <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl text-center shadow-md">
+                   <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"/>
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9l6-6m0 0l6 6m-6-6v12"/>
+                     </svg>
+                   </div>
+                  <h3 class="font-semibold mb-2">Tailwind CSS</h3>
+                  <p class="text-sm text-muted-foreground">Utility-first CSS framework</p>
+                </div>
+              </div>
+
+               <div class="relative group">
+                 <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl transform group-hover:scale-105 transition-transform shadow-lg"></div>
+                 <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl text-center shadow-md">
+                   <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+                     </svg>
+                   </div>
+                  <h3 class="font-semibold mb-2">Docker</h3>
+                  <p class="text-sm text-muted-foreground">Container platform</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- CTA Section -->
+          <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4 text-gradient">Ready to Get Started?</h2>
+            <p class="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join us on this journey to create amazing web experiences
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/" class="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group overflow-hidden inline-block">
+                <span class="relative z-10">Back to Home</span>
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </a>
+              <a href="/blog" class="relative px-8 py-4 bg-background border border-border rounded-xl hover:bg-muted hover:scale-105 transition-all duration-300 group inline-block">
+                <span class="relative z-10">Read Our Blog</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

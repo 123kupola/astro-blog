@@ -1,0 +1,55 @@
+services:
+  astro-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app
+      - /app/dist
+      - /app/.astro
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      - PORT=4321
+      - SITE_URL=http://localhost:4321
+      - SITE_NAME=Astro Modular Demo
+      - SITE_DESCRIPTION=A flexible blog theme designed for Obsidian users
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4321', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-network
+
+  # Optional: Add a reverse proxy (nginx) for production
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Uncomment for SSL certificates
+      # - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - astro-app
+    restart: unless-stopped
+    networks:
+      - ai-network
+    profiles:
+      - production
+
+networks:
+  ai-network:
+    external: true
+
+volumes:
+  node_modules:
+  dist:
+  .astro:

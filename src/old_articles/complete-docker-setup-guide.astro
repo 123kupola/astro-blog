@@ -1,0 +1,193 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SITE } from '../../config.mjs';
+
+const post = {
+  title: "Complete Docker Setup Guide",
+  description: "A comprehensive guide to setting up an Astro application with Docker, including troubleshooting common issues and best practices.",
+  date: "2024-01-20",
+  author: "DevOps Team",
+  category: "DevOps",
+  image: "https://images.unsplash.com/photo-1667372399003-c85e73e04c72?w=1200&h=600&fit=crop",
+  readTime: "15 min read",
+  content: `
+    <h2>Overview</h2>
+    <p>This guide covers the complete process of containerizing an Astro application, from initial setup to production deployment with proper networking, security, and optimization.</p>
+    
+    <h3>Prerequisites</h3>
+    <ul>
+      <li>Docker and Docker Compose installed</li>
+      <li>Node.js 20+ (for local development)</li>
+      <li>Astro project structure</li>
+    </ul>
+    
+    <h2>Step 1: Fix Package Dependencies</h2>
+    <h3>Issue: Invalid Package Versions</h3>
+    <p>The initial <code>package.json</code> contained non-existent package versions:</p>
+    <pre><code>{
+  "astro-embed": "^0.4.1",  // ❌ Doesn't exist
+  "remark-mermaid": "^2.0.0" // ❌ Doesn't exist
+}</code></pre>
+    
+    <h3>Solution: Update to Valid Versions</h3>
+    <p>Check available versions and update package.json with valid versions:</p>
+    <pre><code>"astro-embed": "^0.9.1",
+"remark-mermaid": "^0.2.0"</code></pre>
+    
+    <h2>Step 2: Configure Astro for Docker</h2>
+    <h3>Issue: Environment Variable Validation</h3>
+    <p>Astro's experimental environment schema was causing build failures. The solution was to remove the experimental environment schema entirely.</p>
+    
+    <h2>Step 3: Fix Tailwind CSS Configuration</h2>
+    <h3>Issue: Missing CSS Variables</h3>
+    <p>The global CSS was using undefined Tailwind classes. The solution was to extend Tailwind with CSS variables.</p>
+    
+    <h2>Step 4: Create Optimized Dockerfile</h2>
+    <h3>Multi-Stage Build Strategy</h3>
+    <p>Using a multi-stage build strategy reduces final image size and improves security:</p>
+    <ul>
+      <li><strong>Base Stage:</strong> Sets up Node.js environment</li>
+      <li><strong>Deps Stage:</strong> Installs dependencies with caching</li>
+      <li><strong>Builder Stage:</strong> Builds the application</li>
+      <li><strong>Runner Stage:</strong> Production-ready image with security best practices</li>
+    </ul>
+    
+    <h2>Step 5: Configure Docker Compose</h2>
+    <p>The compose.yaml configuration includes:</p>
+    <ul>
+      <li>External network usage</li>
+      <li>Environment variables for runtime configuration</li>
+      <li>Health checks for container monitoring</li>
+      <li>Optional nginx reverse proxy for production</li>
+    </ul>
+    
+    <h2>Performance Optimization</h2>
+    <h3>Docker Build Performance</h3>
+    <p>The original Dockerfile had a performance bottleneck with recursive <code>chown</code> operations taking 56+ seconds. The optimized solution reduces this to 0.8 seconds - a 70x improvement!</p>
+    
+    <h3>Key Optimization Techniques</h3>
+    <ul>
+      <li><strong>Avoid Recursive chown:</strong> Only change ownership of directory, not contents</li>
+      <li><strong>Early User Switching:</strong> Switch to non-root user as early as possible</li>
+      <li><strong>Optimized npm Cache:</strong> Use temporary cache directory for faster installs</li>
+      <li><strong>Layer Optimization:</strong> Combine related operations in single RUN layer</li>
+    </ul>
+    
+    <h2>Security Best Practices</h2>
+    <ul>
+      <li><strong>Non-root user:</strong> Container runs as non-root user</li>
+      <li><strong>Minimal base image:</strong> Using official Node.js slim image</li>
+      <li><strong>Multi-stage build:</strong> Reduces attack surface</li>
+      <li><strong>Health checks:</strong> Container monitoring</li>
+    </ul>
+    
+    <h2>Conclusion</h2>
+    <p>This guide provides a complete, production-ready setup for Astro applications with Docker. The configuration addresses common issues including dependency management, proper networking, security, and performance optimization.</p>
+  `
+};
+---
+
+<Layout title={post.title + " - " + SITE.title} description={post.description}>
+  <main class="relative">
+    <!-- Article Header -->
+    <article class="relative">
+      <div class="relative h-96 overflow-hidden">
+        <img 
+          src={post.image} 
+          alt={post.title}
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-8">
+          <div class="container mx-auto">
+            <div class="max-w-4xl mx-auto">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">
+                  Featured
+                </span>
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-xs font-medium">
+                  {post.category}
+                </span>
+              </div>
+              <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                {post.title}
+              </h1>
+              <div class="flex items-center space-x-4 text-white/90">
+                <span>{post.author}</span>
+                <span>•</span>
+                <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article Content -->
+      <div class="py-16">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto">
+            <div class="prose prose-lg max-w-none dark:prose-invert">
+              <div set:html={post.content} />
+            </div>
+            
+            <!-- Article Footer -->
+            <div class="mt-16 pt-8 border-t border-border">
+              <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-4">
+                  <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold">DT</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">{post.author}</div>
+                    <div class="text-sm text-muted-foreground">DevOps Team</div>
+                  </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326"></path>
+                    </svg>
+                  </button>
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4 4l4 4m0 0l-4-4m4 4v-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Related Posts -->
+            <div class="mt-16">
+              <h3 class="text-2xl font-bold mb-8 text-gradient">Related Articles</h3>
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Modern CSS Techniques</h4>
+                    <p class="text-sm text-muted-foreground">Explore glass morphism and animations</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">TypeScript Fundamentals</h4>
+                    <p class="text-sm text-muted-foreground">Master type-safe JavaScript</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-blue-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Performance Tips</h4>
+                    <p class="text-sm text-muted-foreground">Optimize your web applications</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</Layout>

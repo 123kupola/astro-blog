@@ -1,0 +1,155 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { siteConfig } from '../config';
+
+// Fetch all posts from the content collection
+const allPosts = await getCollection('posts');
+
+// Filter published posts
+const publishedPosts = allPosts.filter(post => post.data.published);
+
+// Map the post data to the expected format and sort by date
+const posts = publishedPosts.map((post) => ({
+  title: post.data.title || 'Untitled Post',
+  description: post.data.description || '',
+  date: new Date(post.data.date).toISOString(),
+  author: post.data.author || 'Tech Team',
+  category: post.data.tags ? post.data.tags[0] : 'General',
+  image: post.data.heroImage || post.data.image || 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop',
+  readTime: '5 min read', // Could be calculated from content
+  featured: post.data.featured || false,
+  url: `/blog/${post.slug}`
+})).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+// Separate featured posts from regular posts.
+const featuredPost = posts.find(post => post.featured);
+const regularPosts = posts.filter(post => !post.featured);
+---
+
+<Layout title={`Blog - ${siteConfig.title}`} description="Read our latest articles about web development, design, and technology">
+  <main class="relative">
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20"></div>
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <h1 class="text-3xl md:text-5xl font-bold mb-6 text-gradient animate-gradient">
+            Latest entries
+          </h1>
+          <hr class="w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-8 border-0">
+          <p class="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Insights, tutorials, and stories from our journey building modern web experiences
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Post -->
+    {featuredPost && (
+      <section class="py-12 relative">
+        <div class="container mx-auto px-4">
+          <div class="max-w-6xl mx-auto">
+            <a href={featuredPost.url} class="relative group block">
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl transform group-hover:scale-[1.02] transition-transform"></div>
+              <div class="relative bg-background/80 backdrop-blur-sm border border-border/50 rounded-3xl overflow-hidden">
+                <div class="md:flex">
+                  <div class="md:w-1/2">
+                    <img 
+                      src={featuredPost.image} 
+                      alt={featuredPost.title}
+                      class="w-full h-64 md:h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="md:w-1/2 p-8 flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-4">
+                      <span class="px-3 py-1 bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">
+                        Featured
+                      </span>
+                      <span class="px-3 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-medium">
+                        {featuredPost.category}
+                      </span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 text-gradient">
+                      {featuredPost.title}
+                    </h2>
+                    <p class="text-muted-foreground mb-6 line-clamp-3">
+                      {featuredPost.description}
+                    </p>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span>{featuredPost.author}</span>
+                        <span>•</span>
+                        <span>{new Date(featuredPost.date).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{featuredPost.readTime}</span>
+                      </div>
+                      <div class="relative px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group-hover:opacity-100 overflow-hidden inline-block">
+                        <span class="relative z-10">Read More</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Blog Grid -->
+    <section class="py-12 relative">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {regularPosts.map((post) => (
+              <article>
+                <a href={post.url} class="relative group block h-full">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
+                    <div class="aspect-video overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                      <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-medium">
+                          {post.category}
+                        </span>
+                        <span class="text-xs text-muted-foreground">{post.readTime}</span>
+                      </div>
+                      <h3 class="text-xl font-semibold mb-3 group-hover:text-gradient transition-colors flex-grow">
+                        {post.title}
+                      </h3>
+                      <p class="text-muted-foreground mb-4 line-clamp-2">
+                        {post.description}
+                      </p>
+                      <div class="flex items-center justify-between mt-auto">
+                        <div class="text-sm text-muted-foreground">
+                          {new Date(post.date).toLocaleDateString()}
+                        </div>
+                        <div class="flex items-center space-x-1 text-primary group-hover:text-primary/80 transition-colors">
+                          <span class="text-sm font-medium">Read More</span>
+                          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

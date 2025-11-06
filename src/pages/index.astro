@@ -1,0 +1,235 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import { siteConfig as SITE } from '../config';
+---
+
+<Layout title={SITE.title} description={SITE.description}>
+  <main class="relative">
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-pink-600/10 dark:from-blue-600/20 dark:via-purple-600/20 dark:to-pink-600/20"></div>
+      
+      <!-- Animated particles background -->
+      <div class="absolute inset-0">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+        <div class="absolute top-40 right-10 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+        <div class="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+      </div>
+      
+      <div class="relative z-10 container mx-auto px-4 text-center">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-8">
+            <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20 border border-blue-500/20 dark:border-blue-500/30 rounded-full text-sm font-medium text-blue-600 dark:text-blue-400 mb-6 backdrop-blur-sm">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+              </svg>
+              Next-Gen Web Development
+            </div>
+          </div>
+          
+          <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+            {SITE.title}
+          </h1>
+          
+          <p class="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+            A cutting-edge modular theme designed for the modern web. Experience the perfect blend of performance, elegance, and innovation.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <button class="relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 group overflow-hidden">
+              <span class="relative z-10">Get Started</span>
+              <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </button>
+            
+             <a href="https://www.youtube.com/watch?v=l_wnOrT3LfA" target="_blank" class="relative px-8 py-4 bg-background border border-border rounded-xl hover:bg-muted hover:scale-105 transition-all duration-300 group">
+               <span class="relative z-10 flex items-center justify-center">
+                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-5-5 5 5z"></path>
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                 </svg>
+                 Watch Demo
+               </span>
+             </a>
+          </div>
+          
+          <!-- Tech stack badges -->
+          <div class="flex flex-wrap justify-center gap-2">
+            <span class="px-3 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-mono">Astro</span>
+            <span class="px-3 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-mono">TypeScript</span>
+            <span class="px-3 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-mono">Tailwind CSS</span>
+            <span class="px-3 py-1 bg-muted/50 border border-border/50 rounded-full text-xs font-mono">Docker</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 relative">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Built for the Future
+          </h2>
+          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Experience the perfect combination of cutting-edge technology and elegant design
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+            <div class="relative p-8 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl hover:shadow-2xl transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
+              <p class="text-muted-foreground">Optimized for performance with minimal JavaScript and instant page loads.</p>
+            </div>
+          </div>
+          
+          <!-- Feature 2 -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+            <div class="relative p-8 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl hover:shadow-2xl transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">Modern Design</h3>
+              <p class="text-muted-foreground">Beautiful, responsive interfaces with smooth animations and interactions.</p>
+            </div>
+          </div>
+          
+          <!-- Feature 3 -->
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-blue-500/10 rounded-2xl transform group-hover:scale-105 transition-transform"></div>
+            <div class="relative p-8 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl hover:shadow-2xl transition-all duration-300">
+              <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-blue-600 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">Secure & Reliable</h3>
+              <p class="text-muted-foreground">Built with best practices for security and deployed with Docker containers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- YouTube Demo Section -->
+    <section class="py-20 relative">
+      <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Media Integration
+            </h2>
+            <p class="text-lg text-muted-foreground">
+              Seamless YouTube embed with optimized performance
+            </p>
+          </div>
+          
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl transform group-hover:scale-[1.02] transition-transform"></div>
+            <div class="relative p-8 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl">
+              <div class="video-container">
+                <lite-youtube 
+                  videoid="dQw4w9WgXcQ" 
+                  playlabel="Play video: Experience the future of web development"
+                  params="controls=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&disablekb=1"
+                  style={`background-image: url('https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg');`}>
+                </lite-youtube>
+              </div>
+              
+              <div class="mt-6 flex flex-wrap gap-2">
+                <span class="px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 rounded-full text-xs font-medium">Performance Optimized</span>
+                <span class="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 rounded-full text-xs font-medium">Lightweight</span>
+                <span class="px-3 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-full text-xs font-medium">Accessible</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 relative">
+      <div class="container mx-auto px-4">
+        <div class="relative group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl transform group-hover:scale-[1.02] transition-transform"></div>
+          <div class="relative p-12 text-center text-white">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Ready to Get Started?
+            </h2>
+            <p class="text-lg mb-8 text-white/90">
+              Join the future of web development today
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <button class="px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 hover:scale-105 transition-all duration-300">
+                Start Building
+              </button>
+              <button class="px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold rounded-xl hover:bg-white/30 hover:scale-105 transition-all duration-300">
+                View Documentation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import 'lite-youtube-embed';
+  
+  // Handle YouTube logo overlay
+  document.addEventListener('DOMContentLoaded', () => {
+    const liteYoutubeElements = document.querySelectorAll('lite-youtube');
+    
+    liteYoutubeElements.forEach(element => {
+      // Listen for when the video starts playing
+      element.addEventListener('liteYoutubeIframeLoaded', () => {
+        const iframe = element.querySelector('iframe');
+        if (iframe) {
+          // Try to hide YouTube branding after iframe loads
+          setTimeout(() => {
+            try {
+              // This is a best-effort attempt - YouTube controls are hard to customize
+              const style = document.createElement('style');
+              style.textContent = `
+                .ytp-chrome-top {
+                  display: none !important;
+                }
+                .ytp-watermark {
+                  display: none !important;
+                }
+                .ytp-youtube-button {
+                  display: none !important;
+                }
+              `;
+              iframe.contentDocument?.head.appendChild(style);
+            } catch (e) {
+              // Cross-origin restrictions prevent this
+              console.log('Cannot modify YouTube iframe due to cross-origin restrictions');
+            }
+          }, 1000);
+        }
+      });
+    });
+  });
+</script>

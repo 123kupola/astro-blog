@@ -1,0 +1,293 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { SITE } from '../../config.mjs';
+
+const post = {
+  title: "Astro Modular Demo - Quick Start Guide",
+  description: "A complete Docker setup for running an Astro demo site using the Astro Modular theme with features like dark/light mode, search, and responsive design.",
+  date: "2024-01-18",
+  author: "Tech Team",
+  category: "Tutorial",
+  image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=1200&h=600&fit=crop",
+  readTime: "8 min read",
+  content: `
+    <h2>Features</h2>
+    <p>The Astro Modular Demo includes a comprehensive set of features designed for modern web development:</p>
+    
+    <div class="grid md:grid-cols-2 gap-4 my-6">
+      <div class="p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/20">
+        <h4 class="font-semibold mb-2">🚀 Astro Modular Theme</h4>
+        <p>A flexible blog theme designed for Obsidian users with advanced features</p>
+      </div>
+      <div class="p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg border border-purple-500/20">
+        <h4 class="font-semibold mb-2">🐳 Docker Support</h4>
+        <p>Complete containerization with multi-stage builds and security best practices</p>
+      </div>
+      <div class="p-4 bg-gradient-to-r from-pink-500/10 to-blue-500/10 rounded-lg border border-pink-500/20">
+        <h4 class="font-semibold mb-2">🌙 Dark/Light Mode</h4>
+        <p>Automatic theme switching with localStorage persistence and system preference detection</p>
+      </div>
+      <div class="p-4 bg-gradient-to-r from-blue-500/10 to-green-500/10 rounded-lg border border-blue-500/20">
+        <h4 class="font-semibold mb-2">📱 Responsive Design</h4>
+        <p>Mobile-first approach with Tailwind CSS and fluid typography</p>
+      </div>
+    </div>
+    
+    <h2>Quick Start</h2>
+    
+    <h3>Using Docker Compose (Recommended)</h3>
+    <p>The easiest way to get started is using Docker Compose:</p>
+    
+    <h4>1. Clone and navigate to the project:</h4>
+    <pre><code>git clone &lt;your-repo-url&gt;
+cd astro</code></pre>
+    
+    <h4>2. Build and run with Docker Compose:</h4>
+    <pre><code>docker-compose up --build</code></pre>
+    
+    <h4>3. Access your site:</h4>
+    <p>Open your browser and navigate to <code>http://localhost:4321</code></p>
+    
+    <h3>Local Development</h3>
+    <p>For local development without Docker:</p>
+    
+    <h4>1. Install dependencies:</h4>
+    <pre><code>npm install</code></pre>
+    
+    <h4>2. Start the development server:</h4>
+    <pre><code>npm run dev</code></pre>
+    
+    <h4>3. Access your site:</h4>
+    <p>Open your browser and navigate to <code>http://localhost:4321</code></p>
+    
+    <h2>Development with Docker</h2>
+    <p>For development with live reload, you can uncomment the volume mounts in <code>docker-compose.yml</code>:</p>
+    <pre><code>volumes:
+  - .:/app
+  - /app/node_modules
+  - /app/dist
+  - /app/.astro</code></pre>
+    
+    <h2>Production Deployment</h2>
+    
+    <h3>With Nginx Reverse Proxy</h3>
+    <p>For production deployment, you can use nginx as a reverse proxy:</p>
+    
+    <h4>1. Create an nginx configuration file (<code>nginx.conf</code>):</h4>
+    <pre><code>events {
+    worker_connections 1024;
+}
+
+http {
+    upstream astro {
+        server astro-app:4321;
+    }
+
+    server {
+        listen 80;
+        server_name localhost;
+
+        location / {
+            proxy_pass http://astro;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+}</code></pre>
+    
+    <h4>2. Run with nginx:</h4>
+    <pre><code>docker-compose --profile production up --build</code></pre>
+    
+    <h2>Environment Variables</h2>
+    <p>You can customize your site using environment variables:</p>
+    
+    <div class="grid md:grid-cols-2 gap-4 my-6">
+      <div class="p-4 bg-muted/50 rounded-lg">
+        <h4 class="font-semibold mb-2">Build-time Variables:</h4>
+        <ul>
+          <li><code>SITE_URL</code>: Your site URL</li>
+          <li><code>SITE_NAME</code>: Your site name</li>
+          <li><code>SITE_DESCRIPTION</code>: Your site description</li>
+        </ul>
+      </div>
+      <div class="p-4 bg-muted/50 rounded-lg">
+        <h4 class="font-semibold mb-2">Runtime Variables:</h4>
+        <ul>
+          <li><code>NODE_ENV</code>: Set to <code>production</code> for production builds</li>
+          <li><code>HOST</code>: Set to <code>0.0.0.0</code> for external access</li>
+          <li><code>PORT</code>: Port number (default: 4321)</li>
+        </ul>
+      </div>
+    </div>
+    
+    <h2>Theme Features</h2>
+    <p>The Astro Modular theme includes advanced features for modern web development:</p>
+    
+    <div class="space-y-4">
+      <div class="p-4 border border-border/50 rounded-lg">
+        <h4 class="font-semibold mb-2">🎨 Design Features</h4>
+        <ul>
+          <li><strong>Glass Morphism Effects:</strong> Modern frosted glass UI elements</li>
+          <li><strong>Gradient Animations:</strong> Smooth color transitions and effects</li>
+          <li><strong>Dark Mode Support:</strong> Automatic theme switching</li>
+          <li><strong>Responsive Design:</strong> Mobile-first approach</li>
+        </ul>
+      </div>
+      
+      <div class="p-4 border border-border/50 rounded-lg">
+        <h4 class="font-semibold mb-2">⚡ Performance Features</h4>
+        <ul>
+          <li><strong>Image Optimization:</strong> Automatic image compression and optimization</li>
+          <li><strong>Code Splitting:</strong> Optimized JavaScript loading</li>
+          <li><strong>CSS Optimization:</strong> Minimal CSS with efficient selectors</li>
+          <li><strong>Caching Strategy:</strong> Browser and server caching</li>
+        </ul>
+      </div>
+      
+      <div class="p-4 border border-border/50 rounded-lg">
+        <h4 class="font-semibold mb-2">🔧 Development Features</h4>
+        <ul>
+          <li><strong>Hot Module Replacement:</strong> Instant development updates</li>
+          <li><strong>TypeScript Support:</strong> Type-safe development</li>
+          <li><strong>Component Architecture:</strong> Reusable UI components</li>
+          <li><strong>Docker Integration:</strong> Container-ready deployment</li>
+        </ul>
+      </div>
+    </div>
+    
+    <h2>Troubleshooting</h2>
+    
+    <h3>Common Issues</h3>
+    
+    <div class="space-y-4">
+      <div class="p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg">
+        <h4 class="font-semibold mb-2">1. Port conflicts</h4>
+        <p><strong>Cause:</strong> Port 4321 is already in use</p>
+        <p><strong>Solution:</strong> Change the port in docker-compose.yml or stop the conflicting service</p>
+      </div>
+      
+      <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded-r-lg">
+        <h4 class="font-semibold mb-2">2. Permission issues</h4>
+        <p><strong>Cause:</strong> Docker doesn't have proper file permissions</p>
+        <p><strong>Solution:</strong> Check that all files have correct ownership and permissions</p>
+      </div>
+      
+      <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-r-lg">
+        <h4 class="font-semibold mb-2">3. Build failures</h4>
+        <p><strong>Cause:</strong> Missing dependencies or configuration issues</p>
+        <p><strong>Solution:</strong> Check that all dependencies are properly installed and configured</p>
+      </div>
+    </div>
+    
+    <h2>Conclusion</h2>
+    <p>The Astro Modular Demo provides a complete, production-ready setup for modern web development. With Docker support, responsive design, and comprehensive features, it's an excellent starting point for building sophisticated web applications.</p>
+  `
+};
+---
+
+<Layout title={post.title + " - " + SITE.title} description={post.description}>
+  <main class="relative">
+    <!-- Article Header -->
+    <article class="relative">
+      <div class="relative h-96 overflow-hidden">
+        <img 
+          src={post.image} 
+          alt={post.title}
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-8">
+          <div class="container mx-auto">
+            <div class="max-w-4xl mx-auto">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="px-3 py-1 bg-gradient-to-r from-green-500/10 to-blue-500/10 text-green-600 dark:text-green-400 border border-green-500/20 rounded-full text-xs font-medium">
+                  Tutorial
+                </span>
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white rounded-full text-xs font-medium">
+                  {post.category}
+                </span>
+              </div>
+              <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                {post.title}
+              </h1>
+              <div class="flex items-center space-x-4 text-white/90">
+                <span>{post.author}</span>
+                <span>•</span>
+                <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article Content -->
+      <div class="py-16">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto">
+            <div class="prose prose-lg max-w-none dark:prose-invert">
+              <div set:html={post.content} />
+            </div>
+            
+            <!-- Article Footer -->
+            <div class="mt-16 pt-8 border-t border-border">
+              <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-4">
+                  <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <span class="text-white font-bold">TT</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold">{post.author}</div>
+                    <div class="text-sm text-muted-foreground">Tech Team</div>
+                  </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-7.432 0m9.032-4.026A9.001 9.001 0 0112 3c-4.474 0-8.268 3.12-9.032 7.326m0 0A9.001 9.001 0 0012 21c4.474 0 8.268-3.12 9.032-7.326"></path>
+                    </svg>
+                  </button>
+                  <button class="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4 4l4 4m0 0l-4-4m4 4v-6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Related Posts -->
+            <div class="mt-16">
+              <h3 class="text-2xl font-bold mb-8 text-gradient">Related Articles</h3>
+              <div class="grid md:grid-cols-3 gap-6">
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Getting Started with Astro</h4>
+                    <p class="text-sm text-muted-foreground">Learn Astro fundamentals</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Docker Best Practices</h4>
+                    <p class="text-sm text-muted-foreground">Container optimization strategies</p>
+                  </div>
+                </div>
+                <div class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-xl transform group-hover:scale-105 transition-transform"></div>
+                  <div class="relative p-6 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+                    <h4 class="font-semibold mb-2">Performance Optimization</h4>
+                    <p class="text-sm text-muted-foreground">Speed up your applications</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+</Layout>
