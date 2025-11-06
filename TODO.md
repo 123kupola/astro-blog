@@ -42,7 +42,7 @@
 
 ### Features & Integrations
 - [x] Admin dashboard for content management
-- [x] Authentication system with API endpoints
+- [x] OAuth authentication system with Google login (Better Auth)
 - [x] Search functionality with Pagefind
 - [x] SEO optimization (sitemap, meta tags, RSS)
 - [x] Multilingual support (English/Slovenian)
@@ -110,7 +110,7 @@
 - **Blog Posts**: 6 articles
 - **How-To Guides**: 5 tutorials
 - **Languages**: English, Slovenian
-- **Technologies**: Astro, TypeScript, Tailwind, Docker, Obsidian
+- **Technologies**: Astro, TypeScript, Tailwind, Docker, Obsidian, Better Auth
 
 ## 🏆 Achievements
 
@@ -118,6 +118,7 @@
 - **Docker Production Ready**: Complete containerization
 - **Content Management**: Seamless Obsidian integration
 - **Multilingual Support**: Proper i18n implementation
+- **OAuth Authentication**: Professional Google login with Better Auth
 - **Performance Optimized**: Fast builds and loading
 - **Security Focused**: No deprecated dependencies
 

@@ -16,6 +16,12 @@ services:
       - SITE_URL=http://localhost:4321
       - SITE_NAME=Astro Modular Demo
       - SITE_DESCRIPTION=A flexible blog theme designed for Obsidian users
+      # Better Auth Configuration
+      - BETTER_AUTH_SECRET=a8ebaf964d2f0adb4a259418e165d8587b8f969fa10f5645428226cb25ce1611
+      - BETTER_AUTH_URL=http://localhost:4321
+      # Google OAuth (set these in your .env file)
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     command: ["npm", "run", "dev"]
     restart: unless-stopped
     healthcheck:

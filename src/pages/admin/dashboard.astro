@@ -10,8 +10,23 @@ const description = "Admin dashboard for managing site content";
     <div class="max-w-4xl mx-auto">
       <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
         <div class="px-4 py-5 sm:p-6">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Admin Dashboard</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">Welcome to the admin panel. Here you can manage your content.</p>
+          <div class="flex items-center justify-between mb-4">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
+            {Astro.locals.user && (
+              <div class="flex items-center space-x-3">
+                {Astro.locals.user.image && (
+                  <img src={Astro.locals.user.image} alt={Astro.locals.user.name || 'User'} class="w-8 h-8 rounded-full" />
+                )}
+                <div class="text-right">
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{Astro.locals.user.name || 'Admin'}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{Astro.locals.user.email}</p>
+                </div>
+              </div>
+            )}
+          </div>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
+            Welcome to the admin panel{Astro.locals.user?.name ? `, ${Astro.locals.user.name.split(' ')[0]}` : ''}. Here you can manage your content.
+          </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg">
@@ -34,14 +49,35 @@ const description = "Admin dashboard for managing site content";
           </div>
 
           <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <form action="/api/auth/logout" method="POST" class="inline">
-              <button type="submit" class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-md">
-                Logout
-              </button>
-            </form>
+            <button
+              id="logout-btn"
+              class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-4 py-2 rounded-md"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <script>
+    import { authClient } from '../../lib/auth-client';
+
+    document.getElementById('logout-btn')?.addEventListener('click', async () => {
+      try {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              window.location.href = '/admin';
+            },
+          },
+        });
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // Fallback: redirect anyway
+        window.location.href = '/admin';
+      }
+    });
+  </script>
 </Layout>

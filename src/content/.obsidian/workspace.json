@@ -1,0 +1,179 @@
+{
+  "main": {
+    "id": "e49e2ab4041f13b5",
+    "type": "split",
+    "children": [
+      {
+        "id": "5cc75db494edd796",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9ee32470b1d7184a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "posts/complete-astro-docker-guide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "complete-astro-docker-guide"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "acfef9c9e55c6c3d",
+    "type": "split",
+    "children": [
+      {
+        "id": "058c09b713648bfa",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0de7dafb10397d7b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "25e549c47a608348",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "864af857fb0f991c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "075869e85160376a",
+    "type": "split",
+    "children": [
+      {
+        "id": "1ded0b6b4c458a30",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "afc76a35060ed95b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "howtos/Shell commands.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Shell commands"
+            }
+          },
+          {
+            "id": "6c4033fc2b35022b",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "howtos/Shell commands.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Shell commands"
+            }
+          },
+          {
+            "id": "53c6719ff24de88d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "5b66f25d05909c47",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "howtos/Shell commands.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Shell commands"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "9ee32470b1d7184a",
+  "lastOpenFiles": [
+    "posts/astro-modular-demo-overview.md",
+    "howtos/Shell commands.md",
+    "assets/sample-image.jpg.txt",
+    "posts/json-objektna-notacija-javascripta.md"
+  ]
+}
