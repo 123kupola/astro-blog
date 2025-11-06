@@ -34,6 +34,8 @@
 - ✅ **API Endpoints**: Added /api/auth/check and /api/auth/logout endpoints
 - ✅ **Code Quality**: Clean, production-ready authentication system
 - ✅ **Documentation Updated**: Obsidian guide corrected for proper vault path
+- ✅ **Blog Posts Updated**: Authentication references updated in demo and production guides
+- ✅ **New OAuth Guide**: Comprehensive "Setting Up Google OAuth Authentication" how-to created
 
 ---
 
