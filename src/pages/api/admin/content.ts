@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Content directories
-const CONTENT_DIR = path.join(__dirname, '..', '..', 'content');
+const CONTENT_DIR = path.join(__dirname, '..', '..', '..', 'content');
 const POSTS_DIR = path.join(CONTENT_DIR, 'posts');
 const HOWTOS_DIR = path.join(CONTENT_DIR, 'howtos');
 

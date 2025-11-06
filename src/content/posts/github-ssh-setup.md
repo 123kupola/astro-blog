@@ -1,9 +1,9 @@
 ---
-title: "SSH Key Setup Guide for GitHub"
-description: "Complete guide to setting up SSH key authentication for GitHub repositories"
-date: "2025-11-04"
-author: "Tech Team"
-published: true
+title: SSH Key Setup Guide for GitHub
+description: Complete guide to setting up SSH key authentication for GitHub repositories
+date: 2025-11-04
+author: Tech Team
+published: false
 featured: false
 tags: ["github", "ssh", "git", "authentication", "security"]
 ---
