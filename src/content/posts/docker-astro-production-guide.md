@@ -123,7 +123,7 @@ Beyond technical optimization, we elevated the user experience with modern desig
 
 ### Production Features
 - **Environment variables**: Runtime configuration without rebuilds
-- **Admin authentication**: Session-based login with API endpoints
+- **Admin authentication**: Google OAuth with secure session management
 - **Hybrid rendering**: Static blog pages with SSR admin pages
 - **Logging**: Structured output for monitoring systems
 - **Graceful shutdown**: Proper signal handling

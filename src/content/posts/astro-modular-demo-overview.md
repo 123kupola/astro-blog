@@ -53,7 +53,7 @@ cd astro
 docker-compose up --build
 
 # Access at http://localhost:4321
-# Admin login: admin@test.com / testtest
+# Admin Access: Google OAuth Authentication
 ```
 
 ## 📝 Content Creation Workflow
@@ -105,7 +105,7 @@ Our component library includes:
 - **Framework**: Astro 5.x with MDX support and SSR for admin pages
 - **Styling**: Tailwind CSS with custom design system and dark mode
 - **Content**: Obsidian vault with Markdown files
-- **Authentication**: Session-based admin login with API endpoints
+- **Authentication**: Google OAuth with secure session management
 - **Container**: Docker with multi-stage builds
 - **Deployment**: Hybrid static/SSR site ready for any hosting platform
 
